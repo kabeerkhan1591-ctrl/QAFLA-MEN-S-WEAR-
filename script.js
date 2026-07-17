@@ -1,0 +1,1484 @@
+'use strict';
+const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';   // console.cloud.google.com/apis/credentials
+const FACEBOOK_APP_ID  = '1234567890';   // developers.facebook.com/apps
+const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
+const IMG_HERO  = IMG('1542272604-787c3835535d', 2000); // man in casual streetwear, editorial portrait
+const IMG_STORE  = IMG('1441986300917-64674bd600d8', 1200); // shop rail
+const LIFE = ['1445205170230-053b83016050','1544441893-675973e31985','1489987707025-afc232f7ea0f','1556905055-8f358a7a47b2','1516762689617-e1cffcef479d','1591047139829-d91aecb6caea','1542272604-787c3835535d','1509316785289-025f5b846b35'];
+
+const DEFAULT_CHART = [
+  { size: 'S',   chest: '38', length: '27', sleeve: '7.5' },
+  { size: 'M',   chest: '40', length: '28', sleeve: '8'   },
+  { size: 'L',   chest: '42', length: '29', sleeve: '8.5' },
+  { size: 'XL',  chest: '44', length: '30', sleeve: '9'   },
+  { size: 'XXL', chest: '46', length: '31', sleeve: '9.5' },
+];
+const CARE = 'Machine wash cold, inside out · Tumble dry low · Warm iron if needed · Do not bleach';
+
+const WHATSAPP_GROUP_LINK = '';
+
+// ---- Payments — update these with your real account details ----
+const EASYPAISA_NUMBER = '0332 0463476';
+const JAZZCASH_NUMBER  = '0332 0463476'; // update if your JazzCash account uses a different number
+const BANK_DETAILS = { bank:'Add your bank name', title:'Add your account title', account:'Add your account / IBAN number' };
+
+const SEED_PRODUCTS = [
+  { id:'QF-01', title:'Nomad Crew Tee', sub:'Heavyweight everyday crew neck', cat:'Tees',
+    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2450, compareAt:2950,
+    colorway:{name:'Dune White', hex:'#EDE6DA'}, img:'1521572163474-6864f9cf17ab',
+    isNew:true, featured:true, sizes:{S:8,M:12,L:10,XL:6,XXL:4}, chart:DEFAULT_CHART,
+    desc:'The tee that started the caravan. A dense 220 GSM combed-cotton jersey with a structured collar that keeps its shape wash after wash — cut slightly relaxed through the body for all-day ease.' },
+  { id:'QF-02', title:'Caravan Oversized Tee', sub:'Drop-shoulder boxy fit', cat:'Oversized',
+    fabric:'100% carded open-end cotton · 240 GSM', care:CARE, price:2850, compareAt:0,
+    colorway:{name:'Clay Rust', hex:'#B4654A'}, img:'1552374196-c4e7ffc6e126',
+    isNew:false, featured:true, sizes:{S:5,M:9,L:7,XL:4,XXL:2}, chart:DEFAULT_CHART,
+    desc:'A boxy, drop-shoulder silhouette in a dry-hand 240 GSM jersey. Garment-washed for a lived-in feel from the first wear — the colour deepens beautifully with age.' },
+  { id:'QF-03', title:'Latifabad Classic Tee', sub:'The local favourite', cat:'Tees',
+    fabric:'100% combed cotton · 200 GSM', care:CARE, price:1950, compareAt:2450,
+    colorway:{name:'Ink Black', hex:'#26211D'}, img:'1562157873-818bc0726f68',
+    isNew:false, featured:false, sizes:{S:10,M:14,L:0,XL:8,XXL:5}, chart:DEFAULT_CHART,
+    desc:'Named after our home neighbourhood. A lighter 200 GSM everyday tee with a clean classic fit — the one our regulars buy three at a time.' },
+  { id:'QF-04', title:'Dune Trio Tee Pack', sub:'Three everyday crews, one price', cat:'Tees',
+    fabric:'100% combed cotton · 200 GSM', care:CARE, price:3450, compareAt:0,
+    colorway:{name:'Bone Mix', hex:'#E8DFD2'}, img:'1581655353564-df123a1eb820',
+    isNew:true, featured:false, sizes:{S:6,M:8,L:6,XL:4,XXL:3}, chart:DEFAULT_CHART,
+    desc:'Three essential crew tees in bone, sand and white — pre-washed, pre-shrunk and ready to rotate through the week. The smart way to stock a drawer.' },
+  { id:'QF-05', title:'Mirani Heritage Polo', sub:'Soft piqué · pearl buttons', cat:'Polos',
+    fabric:'Cotton piqué · 240 GSM', care:CARE, price:2950, compareAt:3500,
+    colorway:{name:'Camel', hex:'#C8A27A'}, img:'1603252109303-2751441dd157',
+    isNew:false, featured:false, sizes:{S:7,M:9,L:6,XL:5,XXL:0}, chart:DEFAULT_CHART,
+    desc:'A refined piqué polo with a flat-knit collar and genuine mother-of-pearl buttons. Smart enough for dinner, easy enough for every day.' },
+  { id:'QF-06', title:'Shaheen Piqué Polo', sub:'Signature maroon piqué', cat:'Polos',
+    fabric:'Cotton piqué · 240 GSM', care:CARE, price:3250, compareAt:0,
+    colorway:{name:'Qafla Maroon', hex:'#5C2A1E'}, img:'1586363104862-3a5e2ab60d99',
+    isNew:false, featured:true, sizes:{S:6,M:10,L:8,XL:5,XXL:3}, chart:DEFAULT_CHART,
+    desc:'Our signature polo in the house maroon, named for the arcade we call home. Taped seams, side vents and a collar that stands the way a collar should.' },
+  { id:'QF-07', title:'Souk Stripe Tee', sub:'Yarn-dyed heritage stripes', cat:'Tees',
+    fabric:'Yarn-dyed cotton jersey · 210 GSM', care:CARE, price:2250, compareAt:2850,
+    colorway:{name:'Olive Grove', hex:'#6B7256'}, img:'1523381210434-271e8be1f52b',
+    isNew:false, featured:false, sizes:{S:9,M:11,L:8,XL:0,XXL:4}, chart:DEFAULT_CHART,
+    desc:'Yarn-dyed stripes in warm spice tones — the colour is woven in, not printed on, so it will never crack or fade. A quiet nod to the trading routes.' },
+  { id:'QF-08', title:'Unit-8 Oxford Shirt', sub:'Weekend casual button-down', cat:'Shirts',
+    fabric:'Brushed cotton oxford · 180 GSM', care:CARE, price:3950, compareAt:0,
+    colorway:{name:'White', hex:'#F4EFE6'}, img:'1602810318383-e386cc2a3ccf',
+    isNew:false, featured:true, sizes:{S:5,M:7,L:6,XL:4,XXL:2}, chart:DEFAULT_CHART,
+    desc:'A brushed oxford button-down with a soft, broken-in hand. Wear it open over a tee or buttoned to the top — it earns its place either way.' },
+  { id:'QF-09', title:'Desert Dye Tee', sub:'Garment-dyed · sun-faded', cat:'Tees',
+    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2150, compareAt:0,
+    colorway:{name:'Terracotta', hex:'#B4664A'}, img:'1622445275576-721325763afe',
+    isNew:false, featured:false, sizes:{S:8,M:12,L:9,XL:6,XXL:4}, chart:DEFAULT_CHART,
+    desc:'Garment-dyed in small batches for a sun-faded terracotta that no two pieces share exactly. Cut in our classic block with a reinforced shoulder seam.' },
+  { id:'QF-10', title:'Ravi Henley', sub:'Three-button waffle henley', cat:'Henleys',
+    fabric:'Waffle-knit cotton · 230 GSM', care:CARE, price:2650, compareAt:0,
+    colorway:{name:'Olive', hex:'#7A7561'}, img:'1618354691373-d851c5c3a990',
+    isNew:false, featured:false, sizes:{S:6,M:8,L:7,XL:5,XXL:3}, chart:DEFAULT_CHART,
+    desc:'A three-button henley in textured waffle knit — warm enough to layer, breathable enough to wear alone through a Hyderabad afternoon.' },
+  { id:'QF-11', title:'Saddar Weekend Shirt', sub:'Brushed twill overshirt', cat:'Shirts',
+    fabric:'Brushed cotton twill · 260 GSM', care:CARE, price:3650, compareAt:4250,
+    colorway:{name:'Stone', hex:'#B8AE9E'}, img:'1596755094514-f87e34085b2c',
+    isNew:false, featured:false, sizes:{S:4,M:6,L:5,XL:3,XXL:2}, chart:DEFAULT_CHART,
+    desc:'Part shirt, part light jacket. A brushed twill overshirt with chest pockets and corozo buttons — throw it over any tee in the collection.' },
+  { id:'QF-12', title:'Caravanserai Tee', sub:'Relaxed longline fit', cat:'Oversized',
+    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2550, compareAt:0,
+    colorway:{name:'Dust Rose', hex:'#C9A99A'}, img:'1622470953794-aa9c70b0fb9d',
+    isNew:true, featured:false, sizes:{S:7,M:9,L:8,XL:5,XXL:3}, chart:DEFAULT_CHART,
+    desc:'A relaxed longline tee in the dusty rose of our house pattern. Slightly dropped shoulders, a curved hem and a weight that drapes rather than clings.' },
+  { id:'QF-13', title:'Thar Graphic Tee', sub:'Desert-line chest print', cat:'Tees',
+    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2350, compareAt:0,
+    colorway:{name:'Charcoal', hex:'#3A3532'}, img:'1527719327859-c6ce80353573',
+    isNew:false, featured:true, sizes:{S:8,M:10,L:8,XL:6,XXL:0}, chart:DEFAULT_CHART,
+    desc:'A single continuous line traces a dune horizon across the chest — screen-printed by hand in water-based inks on a deep charcoal base.' },
+  { id:'QF-14', title:'Qafilah Signature Tee', sub:'Embroidered قافلة chest mark', cat:'Tees',
+    fabric:'100% Supima-blend cotton · 230 GSM', care:CARE, price:2950, compareAt:0,
+    colorway:{name:'Cream', hex:'#F0E9DC'}, img:'1620799139507-2a76f79a2f4d',
+    isNew:true, featured:true, sizes:{S:6,M:9,L:7,XL:5,XXL:3}, chart:DEFAULT_CHART,
+    desc:'The flagship. A Supima-blend jersey with our قافلة wordmark embroidered — not printed — over the heart. The tee every Qafla man should own first.' },
+];
+
+const REVIEWS = [
+  { stars:5, text:'“Bought the Shaheen polo last month — the fabric still looks brand new after a dozen washes. Best menswear in Latifabad, easily.”', who:'Ahmed R.', where:'Latifabad, Hyderabad', init:'AR' },
+  { stars:5, text:'“Ordered three tees on WhatsApp, delivered next day. The Qafilah signature tee is worth every rupee — the embroidery is proper work.”', who:'Bilal S.', where:'Saddar, Hyderabad', init:'BS' },
+  { stars:5, text:'“Finally a local brand with real quality. The oversized fit is exactly right and the colours are even better in person.”', who:'Hamza K.', where:'Qasimabad, Hyderabad', init:'HK' },
+];
+
+const K = { products:'qafla_products_v3', cart:'qafla_cart_v3', wish:'qafla_wish_v3', orders:'qafla_orders_v3', admin:'qafla_admin_v3', subs:'qafla_subs_v1', lock:'qafla_admin_lock_v1', pass:'qafla_admin_pass_v1', customers:'qafla_customers_v1', session:'qafla_session_v1' };
+const store = {
+  get(k, f){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e){ return f; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
+};
+
+const state = {
+  products: store.get(K.products, null) || SEED_PRODUCTS.map(p => ({...p, imgs:[p.img, ...LIFE.slice(0,2)], chart:p.chart.map(r=>({...r})), sizes:{...p.sizes}})),
+  cart: store.get(K.cart, []),
+  wish: store.get(K.wish, []),
+  orders: store.get(K.orders, []),
+  subs: store.get(K.subs, []),
+  filters: { q:'', cat:'All', size:'All', sort:'featured' },
+  modal: null,           // {type:'product'|'chart'|'checkout'|'success', ...}
+  pm: { size:null, qty:1, img:0 },
+  admin: { authed: store.get(K.admin, false), tab:'products', editing:null, ...store.get(K.lock, { attempts:0, lockUntil:0 }), reset:{ step:null, otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false } },
+  auth: { session: store.get(K.session, null), view:'signin', err:'', showPass:false },
+  checkout: { method:'cod' },
+};
+if (!store.get(K.products, null)) persistProducts();
+
+function persistProducts(){ store.set(K.products, state.products); }
+function persistCart(){ store.set(K.cart, state.cart); updateCartCount(); }
+function persistWish(){ store.set(K.wish, state.wish); }
+function persistOrders(){ store.set(K.orders, state.orders); }
+function persistSubs(){ store.set(K.subs, state.subs); }
+function persistLoginLock(){ store.set(K.lock, { attempts: state.admin.attempts, lockUntil: state.admin.lockUntil }); }
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOGIN_LOCK_MS = 90 * 1000; // 1 minute 30 seconds
+
+// Customer accounts — stored in this browser only, same as the rest of this demo storefront.
+// Move behind a real auth backend (with hashed passwords) before going live.
+function getCustomers(){ return store.get(K.customers, []); }
+function saveCustomers(list){ store.set(K.customers, list); }
+function findCustomer(email){ return getCustomers().find(c => c.email.toLowerCase() === String(email).toLowerCase()); }
+function persistSession(){ store.set(K.session, state.auth.session); }
+
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => 'Rs. ' + Number(n || 0).toLocaleString('en-US');
+const prodImgs = p => (p.imgs && p.imgs.length ? p.imgs : [p.img]).map(id => id.startsWith('http') ? id : IMG(id));
+const totalStock = p => Object.values(p.sizes || {}).reduce((a,b) => a + Number(b || 0), 0);
+const inStockSizes = p => Object.entries(p.sizes || {}).filter(([,n]) => Number(n) > 0).map(([s]) => s);
+const cartCount = () => state.cart.reduce((a,i) => a + i.qty, 0);
+const cartTotal = () => state.cart.reduce((a,i) => { const p = findProduct(i.id); return a + (p ? p.price * i.qty : 0); }, 0);
+const findProduct = id => state.products.find(p => p.id === id);
+
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  $('#toast-wrap').appendChild(t);
+  setTimeout(() => t.remove(), 3100);
+}
+
+function addToCart(id, size, qty){
+  const p = findProduct(id); if (!p) return;
+  const line = state.cart.find(i => i.id === id && i.size === size);
+  const have = line ? line.qty : 0;
+  if (have + qty > Number(p.sizes[size] || 0)) { toast('Only ' + p.sizes[size] + ' left in size ' + size); return; }
+  if (line) line.qty += qty; else state.cart.push({ id, size, qty });
+  persistCart(); renderDrawer();
+  const cc = $('#cart-count'); cc.classList.add('pop'); setTimeout(() => cc.classList.remove('pop'), 220);
+  toast(p.title + ' · ' + size + ' added to bag');
+}
+function toggleWish(id, btn){
+  const i = state.wish.indexOf(id);
+  if (i > -1) { state.wish.splice(i,1); btn && btn.classList.remove('on'); toast('Removed from wishlist'); }
+  else { state.wish.push(id); btn && btn.classList.add('on'); toast('Saved to wishlist'); }
+  persistWish();
+}
+function updateCartCount(){
+  const n = cartCount();
+  $('#cart-count').textContent = n;
+  $('#drawer-count').textContent = n ? '· ' + n + ' item' + (n>1?'s':'') : '';
+}
+
+function cardHTML(p, delay = 0){
+  const imgs = prodImgs(p);
+  const stock = totalStock(p);
+  const onSale = p.compareAt && p.compareAt > p.price;
+  const wished = state.wish.includes(p.id);
+  return `
+  <article class="card rv ${delay ? 'rv-d' + Math.min(delay,4) : ''}" data-action="open-product" data-id="${esc(p.id)}">
+    <div class="card-media">
+      <img src="${imgs[0]}" alt="${esc(p.title)}" loading="lazy" onerror="this.src='${IMG(p.img || LIFE[0])}'" />
+      <div class="card-tint" style="background:${esc(p.colorway.hex)}"></div>
+      <div class="card-badges">
+        ${stock === 0 ? '<span class="badge badge--out">SOLD OUT</span>' : ''}
+        ${onSale && stock > 0 ? '<span class="badge badge--sale">SALE</span>' : ''}
+        ${p.isNew ? '<span class="badge badge--new">NEW</span>' : ''}
+      </div>
+      <button class="wish ${wished ? 'on' : ''}" data-action="wish" data-id="${esc(p.id)}" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6.3a5 5 0 1 1 7.5 6.3Z"/></svg>
+      </button>
+      <div class="card-quick">Quick view</div>
+    </div>
+    <div class="card-info">
+      <div class="card-code">${esc(p.id)} · ${esc(p.cat).toUpperCase()}</div>
+      <h3 class="card-title">${esc(p.title)}</h3>
+      <div class="card-sub">${esc(p.sub)}</div>
+      <div class="card-row">
+        <span class="price">${fmt(p.price)}</span>
+        ${onSale ? `<span class="price-old">${fmt(p.compareAt)}</span>` : ''}
+      </div>
+      <div class="card-swatches"><span class="dot" style="background:${esc(p.colorway.hex)}"></span></div>
+    </div>
+  </article>`;
+}
+
+function secHead(wp, title, sub, link){
+  return `<div class="sec-head">
+    <div class="rv">
+      <div class="wp">${esc(wp)}</div>
+      <h2 class="sec-title">${title}</h2>
+      ${sub ? `<p class="sec-sub">${esc(sub)}</p>` : ''}
+    </div>
+    ${link ? `<a class="link-arrow rv rv-d1" href="${link.href}">${esc(link.label)} →</a>` : ''}
+  </div>`;
+}
+
+function renderHome(){
+  const news = state.products.filter(p => p.isNew).slice(0, 4);
+  const feats = state.products.filter(p => p.featured).slice(0, 4);
+  const stripItems = ['PREMIUM COMBED COTTON','STITCHED IN PAKISTAN','قافلة','CASH ON DELIVERY','NEW DROPS EVERY MONTH'];
+  const strip = stripItems.map(s => `<span>${s}<i>✦</i></span>`).join('');
+  return `
+  <section class="hero">
+    <div class="hero-bg"><img id="hero-img" src="${IMG_HERO}" alt="Man wearing a premium black crew-neck tee, studio portrait" /></div>
+    <div class="hero-scrim"></div>
+    <div class="hero-inner">
+      <div class="hero-eyebrow rv">QAFLA MEN'S WEAR · HYDERABAD, SINDH</div>
+      <h1 class="rv rv-d1">Dress for the <em>journey</em>, not the destination.</h1>
+      <p class="rv rv-d2">Premium tees, polos and casual shirts — cut from honest cotton, finished by hand, and priced fairly in rupees. قافلة means caravan: we dress the men who keep moving.</p>
+      <div class="hero-cta rv rv-d3">
+        <a class="btn btn--solid" href="#/shop">Shop the collection</a>
+        <a class="btn btn--ghost" href="#/#visit">Visit the store</a>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <span><b>SHOP 02</b> · SHAHEEN ARCADE</span>
+      <span><b>+92 315 3755007</b> · CALL OR WHATSAPP</span>
+      <span>OPEN DAILY · 11 AM – 10 PM</span>
+    </div>
+  </section>
+
+  <div class="strip" aria-hidden="true"><div class="strip-track">${strip}${strip}</div></div>
+
+  <section class="section">
+    <div class="wrap">
+      ${secHead('WAYPOINT 01 · FRESH OFF THE CARAVAN', 'New <em>arrivals</em>', 'The latest pieces to reach the shop — restocked weekly, gone quickly.', {href:'#/shop', label:'Shop all'})}
+      <div class="grid">${news.map((p,i) => cardHTML(p, i)).join('')}</div>
+    </div>
+  </section>
+
+  <section class="section section--accent">
+    <div class="wrap">
+      ${secHead('WAYPOINT 02 · TRIED & TRAVELLED', 'Customer <em>favourites</em>', 'The pieces Hyderabad keeps coming back for.', {href:'#/shop', label:'Shop all'})}
+      <div class="grid">${feats.map((p,i) => cardHTML(p, i)).join('')}</div>
+    </div>
+  </section>
+
+  <section class="section section--deep">
+    <div class="wrap">
+      ${secHead('WAYPOINT 03 · WORD OF MOUTH', 'What the <em>caravan</em> says')}
+      <div class="rev-grid">
+        ${REVIEWS.map((r,i) => `
+        <div class="rev-card rv ${i ? 'rv-d' + i : ''}">
+          <div class="rev-stars">${'★'.repeat(r.stars)}</div>
+          <p>${esc(r.text)}</p>
+          <div class="rev-who"><span class="rev-av">${esc(r.init)}</span><div><b>${esc(r.who)}</b><span>${esc(r.where)}</span></div></div>
+        </div>`).join('')}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="visit">
+    <div class="wrap">
+      ${secHead('WAYPOINT 04 · COME SAY SALAAM', 'Visit the <em>store</em>')}
+      <div class="visit-grid">
+        <div class="visit-card rv">
+          <h3>Shaheen Arcade, Latifabad</h3>
+          <div class="visit-line">
+            <svg viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><b>Shop No. 02, Shaheen Arcade</b><br />Latifabad Unit No. 8, Hyderabad, Sindh, Pakistan</span>
+          </div>
+          <div class="visit-line">
+            <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.9 2.2Z"/></svg>
+            <span><b>+92 315 3755007</b><br />Call or WhatsApp — the owner picks up himself</span>
+          </div>
+          <div class="visit-line">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span><b>Open daily</b> · 11:00 AM – 10:00 PM</span>
+          </div>
+          <div class="visit-cta">
+            <a class="btn btn--clay" href="https://www.google.com/maps/search/?api=1&query=Shaheen+Arcade+Latifabad+Unit+8+Hyderabad+Sindh" target="_blank" rel="noopener">Visit now</a>
+            <a class="btn btn--ghost" href="tel:+923153755007" style="border-color:rgba(251,244,234,.4);color:var(--on-accent)">Call the store</a>
+          </div>
+        </div>
+        <div class="visit-photo rv rv-d2">
+          <img src="${IMG_STORE}" alt="Inside the Qafla store — rails of menswear" loading="lazy" />
+          <span class="tag">SHOP 02 · SHAHEEN ARCADE</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="news rv">
+        <h3>Join the caravan.</h3>
+        <p>Add your WhatsApp number and tap join — you'll be added to our group for first dibs on new arrivals and subscriber-only sale prices. No spam, promise.</p>
+        <form class="news-form" data-action="join-whatsapp">
+          <input type="tel" name="phone" required placeholder="Your WhatsApp number" aria-label="WhatsApp number" />
+          <button class="btn btn--solid" type="submit">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" style="margin-right:.4rem;vertical-align:-3px"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+            Join WhatsApp Group
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>`;
+}
+
+function filteredProducts(){
+  const f = state.filters;
+  let list = state.products.filter(p => {
+    const q = f.q.trim().toLowerCase();
+    const hitQ = !q || (p.title + ' ' + p.sub + ' ' + p.cat + ' ' + p.id).toLowerCase().includes(q);
+    const hitC = f.cat === 'All' || p.cat === f.cat;
+    const hitS = f.size === 'All' || Number((p.sizes || {})[f.size] || 0) > 0;
+    return hitQ && hitC && hitS;
+  });
+  if (f.sort === 'low')  list = [...list].sort((a,b) => a.price - b.price);
+  if (f.sort === 'high') list = [...list].sort((a,b) => b.price - a.price);
+  if (f.sort === 'sale') list = [...list].sort((a,b) => ((b.compareAt||0) > b.price) - ((a.compareAt||0) > a.price));
+  if (f.sort === 'featured') list = [...list].sort((a,b) => (b.featured - a.featured) || (b.isNew - a.isNew));
+  return list;
+}
+
+function renderShop(){
+  const f = state.filters;
+  const cats = ['All', ...new Set(state.products.map(p => p.cat))];
+  const sizes = ['All','S','M','L','XL','XXL'];
+  const list = filteredProducts();
+  return `
+  <section class="page-hero">
+    <div class="wrap">
+      <div class="wp">THE FULL MANIFEST</div>
+      <h2 class="sec-title">The <em>collection</em></h2>
+      <p class="sec-sub">Every piece currently on the rail at Shaheen Arcade — ${state.products.length} styles and counting.</p>
+    </div>
+  </section>
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="toolbar">
+        <label class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input id="shop-search" type="search" placeholder="Search tees, polos, shirts…" value="${esc(f.q)}" />
+        </label>
+        <div class="chips" id="cat-chips">
+          ${cats.map(c => `<button class="chip ${f.cat === c ? 'on' : ''}" data-action="f-cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}
+        </div>
+        <div class="chips">
+          ${sizes.map(s => `<button class="chip ${f.size === s ? 'on' : ''}" data-action="f-size" data-v="${esc(s)}">${esc(s)}</button>`).join('')}
+        </div>
+        <select class="sortsel" id="shop-sort" aria-label="Sort products">
+          <option value="featured" ${f.sort==='featured'?'selected':''}>Sort: Featured</option>
+          <option value="sale" ${f.sort==='sale'?'selected':''}>Sort: On sale first</option>
+          <option value="low" ${f.sort==='low'?'selected':''}>Price: Low to high</option>
+          <option value="high" ${f.sort==='high'?'selected':''}>Price: High to low</option>
+        </select>
+      </div>
+      <div class="result-note">${list.length} OF ${state.products.length} STYLES</div>
+      <div id="shop-results">
+      ${list.length ? `<div class="grid">${list.map((p,i) => cardHTML(p, i % 4)).join('')}</div>`
+        : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter — or call <b>+92 315 3755007</b> and we'll source it for you.</div>`}
+      </div>
+    </div>
+  </section>`;
+}
+
+function renderDrawer(){
+  const body = $('#drawer-body'), foot = $('#drawer-foot');
+  updateCartCount();
+  if (!state.cart.length){
+    body.innerHTML = `<div class="drawer-empty"><span class="serif">Your bag is empty.</span>The caravan waits — go pick something.<br /><br /><a class="link-arrow" href="#/shop" data-action="close-cart-link">Browse the collection →</a></div>`;
+    foot.innerHTML = '';
+    return;
+  }
+  body.innerHTML = state.cart.map((i, idx) => {
+    const p = findProduct(i.id); if (!p) return '';
+    return `<div class="cart-item">
+      <img src="${prodImgs(p)[0]}" alt="${esc(p.title)}" />
+      <div class="ci-info">
+        <div class="ci-title">${esc(p.title)}</div>
+        <div class="ci-meta">${esc(p.id)} · SIZE ${esc(i.size)}</div>
+        <div class="ci-row">
+          <div class="qty">
+            <button data-action="qty" data-idx="${idx}" data-d="-1" aria-label="Decrease">−</button>
+            <span>${i.qty}</span>
+            <button data-action="qty" data-idx="${idx}" data-d="1" aria-label="Increase">+</button>
+          </div>
+          <span class="ci-price">${fmt(p.price * i.qty)}</span>
+        </div>
+      </div>
+      <button class="ci-remove" data-action="remove" data-idx="${idx}" aria-label="Remove item">
+        <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+  foot.innerHTML = `
+    <div class="df-row total"><span>Subtotal</span><span>${fmt(cartTotal())}</span></div>
+    <button class="btn btn--solid wfull" data-action="checkout">Checkout</button>
+    <div class="df-note">Free delivery in Hyderabad · Nationwide COD available</div>`;
+}
+
+function openModal(html, narrow){
+  const box = $('#modal-box');
+  box.className = 'modal' + (narrow ? ' modal--narrow' : '');
+  box.innerHTML = `<button class="modal-x" data-action="close-modal" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>` + html;
+  $('#modal-scrim').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(){
+  $('#modal-scrim').classList.remove('show');
+  document.body.style.overflow = '';
+  state.modal = null;
+}
+
+const AUTH_ICONS = {
+  google: `<svg viewBox="0 0 48 48" width="18" height="18"><path fill="#EA4335" d="M24 9.5c3.4 0 6.4 1.2 8.8 3.4l6.5-6.5C35.3 2.5 30 0 24 0 14.6 0 6.5 5.4 2.5 13.2l7.6 5.9C12 13 17.5 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.6H24v9h12.6c-.5 3-2.2 5.5-4.7 7.2l7.3 5.7C43.6 37.6 46.5 31.6 46.5 24.5Z"/><path fill="#FBBC05" d="M10.1 19.1a14.5 14.5 0 0 0 0 9.8l-7.6 5.9a24 24 0 0 1 0-21.6l7.6 5.9Z"/><path fill="#34A853" d="M24 48c6 0 11.3-2 15-5.4l-7.3-5.7c-2 1.4-4.6 2.2-7.7 2.2-6.5 0-12-4.4-14-10.3l-7.6 5.9C6.5 42.6 14.6 48 24 48Z"/></svg>`,
+  facebook: `<svg viewBox="0 0 24 24" width="18" height="18" fill="#1877F2"><path d="M24 12.07C24 5.4 18.6 0 12 0S0 5.4 0 12.07c0 6 4.4 11 10.1 11.9v-8.4H7v-3.5h3.1V9.4c0-3.1 1.8-4.8 4.6-4.8 1.3 0 2.7.2 2.7.2v3h-1.5c-1.5 0-2 1-2 1.9v2.3h3.4l-.5 3.5h-2.9V24C19.6 23.1 24 18 24 12.07Z"/></svg>`,
+};
+
+function renderAuthModal(){
+  const a = state.auth;
+  if (a.session){
+    const initials = a.session.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    return `
+    <div class="auth-wrap">
+      <div class="auth-avatar">${a.session.avatar ? `<img src="${esc(a.session.avatar)}" alt="" />` : esc(initials)}</div>
+      <h3>Hi, ${esc(a.session.name.split(' ')[0])}</h3>
+      <p>Signed in with ${esc(a.session.provider === 'email' ? 'email' : a.session.provider)} as <b>${esc(a.session.email)}</b>.</p>
+      <a class="btn btn--ghost-dark wfull" href="#/shop">Continue shopping</a>
+      <button class="btn btn--clay wfull" data-action="auth-signout" style="margin-top:.7rem">Sign out</button>
+    </div>`;
+  }
+
+  const isUp = a.view === 'signup';
+  const err = a.err ? `<div class="err">${gateIcon('warn')}<span>${esc(a.err)}</span></div>` : '';
+  return `
+  <div class="auth-wrap">
+    ${gateIcon('lock')}
+    <h3>${isUp ? 'Create your account' : 'Sign in'}</h3>
+    <p>${isUp ? 'Save your details for faster checkout next time.' : 'Sign in to check out faster and track your orders.'}</p>
+    <div class="auth-social">
+      <button class="oauth-btn oauth-btn--google" data-action="auth-google" type="button">${AUTH_ICONS.google}Continue with Google</button>
+      <button class="oauth-btn oauth-btn--facebook" data-action="auth-facebook" type="button">${AUTH_ICONS.facebook}Continue with Facebook</button>
+    </div>
+    <div class="auth-divider"><span>or continue with email</span></div>
+    <form data-action="${isUp ? 'auth-signup' : 'auth-signin'}" class="gate-form-col">
+      ${isUp ? `<input type="text" id="auth-name" placeholder="Full name" autocomplete="name" required />` : ''}
+      <input type="email" id="auth-email" placeholder="Email address" autocomplete="email" required />
+      <div class="pass-field">
+        <input type="${a.showPass ? 'text' : 'password'}" id="auth-pass" placeholder="Password" autocomplete="${isUp ? 'new-password' : 'current-password'}" minlength="4" required />
+        <button type="button" class="pass-eye" data-action="auth-toggle-pass" aria-label="Show password">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+      ${isUp ? `<input type="${a.showPass ? 'text' : 'password'}" id="auth-pass2" placeholder="Confirm password" autocomplete="new-password" minlength="4" required />` : ''}
+      <button class="btn btn--solid" type="submit">${isUp ? 'Create account' : 'Sign in'}</button>
+    </form>
+    ${err}
+    <a class="gate-link" href="#" data-action="auth-switch">${isUp ? 'Already have an account? Sign in' : "New here? Create an account"}</a>
+    ${!isUp ? `<a class="gate-link" href="https://wa.me/923153755007?text=${encodeURIComponent("Hi, I'm having trouble signing in to my Qafla account")}" target="_blank" rel="noopener" style="display:block;margin-top:.4rem">Trouble signing in? Message us on WhatsApp</a>` : ''}
+  </div>`;
+}
+
+function openAuthModal(){
+  state.auth.view = 'signin'; state.auth.err = ''; state.auth.showPass = false;
+  state.modal = { type:'auth' };
+  openModal(renderAuthModal(), true);
+}
+
+function refreshAuthModal(){ openModal(renderAuthModal(), true); }
+
+function completeSocialSignIn({ name, email, provider, avatar }){
+  if (!email){ toast('Could not read an email from ' + provider + ' — try email sign-in instead'); return; }
+  let list = getCustomers();
+  let cust = findCustomer(email);
+  if (!cust){
+    cust = { id:'C-' + Date.now().toString(36), name: name || email.split('@')[0], email, provider, avatar: avatar || '', joined: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) };
+    list.unshift(cust); saveCustomers(list);
+  }
+  state.auth.session = { name: cust.name, email: cust.email, provider: cust.provider, avatar: cust.avatar || '' };
+  persistSession();
+  toast('Welcome, ' + cust.name.split(' ')[0] + '!');
+  closeModal();
+  updateAccountUI();
+}
+
+function decodeJwt(token){
+  try {
+    const base = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+    const json = decodeURIComponent(atob(base).split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2,'0')).join(''));
+    return JSON.parse(json);
+  } catch(e){ return null; }
+}
+
+function ensureGoogleSDK(cb){
+  if (window.google && window.google.accounts && window.google.accounts.id) { cb(); return; }
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.defer = true;
+  s.onload = cb; s.onerror = () => toast('Could not load Google sign-in — check your connection');
+  document.head.appendChild(s);
+}
+
+function googleSignIn(){
+  if (!GOOGLE_CLIENT_ID){ toast('Google sign-in needs a Client ID — add GOOGLE_CLIENT_ID in script.js'); return; }
+  ensureGoogleSDK(() => {
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: resp => {
+        const payload = decodeJwt(resp.credential);
+        if (!payload){ toast('Google sign-in failed — please try again'); return; }
+        completeSocialSignIn({ name: payload.name, email: payload.email, provider:'google', avatar: payload.picture });
+      },
+    });
+    window.google.accounts.id.prompt();
+  });
+}
+
+function ensureFacebookSDK(cb){
+  if (window.FB){ cb(); return; }
+  window.fbAsyncInit = function(){
+    window.FB.init({ appId: FACEBOOK_APP_ID, cookie:true, xfbml:false, version:'v19.0' });
+    cb();
+  };
+  const s = document.createElement('script');
+  s.src = 'https://connect.facebook.net/en_US/sdk.js'; s.async = true; s.defer = true;
+  s.onerror = () => toast('Could not load Facebook sign-in — check your connection');
+  document.head.appendChild(s);
+}
+
+function facebookSignIn(){
+  if (!FACEBOOK_APP_ID){ toast('Facebook sign-in needs an App ID — add FACEBOOK_APP_ID in script.js'); return; }
+  ensureFacebookSDK(() => {
+    window.FB.login(resp => {
+      if (resp.authResponse){
+        window.FB.api('/me', { fields:'name,email,picture' }, data => {
+          completeSocialSignIn({ name: data.name, email: data.email || '', provider:'facebook', avatar: data.picture && data.picture.data && data.picture.data.url });
+        });
+      } else {
+        toast('Facebook sign-in was cancelled');
+      }
+    }, { scope:'public_profile,email' });
+  });
+}
+
+function updateAccountUI(){
+  const btn = $('#nav-account'); if (!btn) return;
+  const s = state.auth.session;
+  if (s){
+    const initials = s.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+    btn.classList.add('has-session');
+    btn.innerHTML = s.avatar ? `<img src="${esc(s.avatar)}" alt="" />` : `<span>${esc(initials)}</span>`;
+    btn.setAttribute('aria-label', 'Account — ' + s.name);
+  } else {
+    btn.classList.remove('has-session');
+    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.6-3.6 4.6-5.5 7.5-5.5s5.9 1.9 7.5 5.5"/></svg>`;
+    btn.setAttribute('aria-label', 'Sign in');
+  }
+}
+
+function openProduct(id, imgIdx = 0){
+  const p = findProduct(id); if (!p) return;
+  state.modal = { type:'product', id };
+  state.pm = { size:null, qty:1, img:imgIdx };
+  renderProductModal(p);
+}
+
+function renderProductModal(p){
+  const imgs = prodImgs(p);
+  const cur = Math.min(state.pm.img, imgs.length - 1);
+  const onSale = p.compareAt && p.compareAt > p.price;
+  const save = onSale ? Math.round((1 - p.price / p.compareAt) * 100) : 0;
+  const stock = totalStock(p);
+  openModal(`
+  <div class="pm">
+    <div class="pm-gallery">
+      <div class="pm-main">
+        <img src="${imgs[cur]}" alt="${esc(p.title)}" />
+        <div class="pm-tint" style="background:${esc(p.colorway.hex)}"></div>
+      </div>
+      <div class="pm-thumbs">
+        ${imgs.map((u,i) => `<img src="${u}" class="${i === cur ? 'on' : ''}" data-action="pm-thumb" data-i="${i}" alt="View ${i+1}" />`).join('')}
+      </div>
+    </div>
+    <div class="pm-info">
+      <div class="pm-code">${esc(p.id)} · ${esc(p.cat).toUpperCase()} · ${esc(p.colorway.name).toUpperCase()}</div>
+      <h3 class="pm-title">${esc(p.title)}</h3>
+      <div class="pm-sub">${esc(p.sub)}</div>
+      <div class="pm-price">
+        <span class="price">${fmt(p.price)}</span>
+        ${onSale ? `<span class="price-old">${fmt(p.compareAt)}</span><span class="save">SAVE ${save}%</span>` : ''}
+      </div>
+      <p class="pm-desc">${esc(p.desc)}</p>
+      <div class="pm-sec">
+        <div class="pm-label"><span>Colourway</span></div>
+        <div class="colorway"><span class="dot" style="background:${esc(p.colorway.hex)}"></span>${esc(p.colorway.name)}</div>
+      </div>
+      <div class="pm-sec">
+        <div class="pm-label"><span>Select size</span><span class="chart-link" data-action="open-chart" data-id="${esc(p.id)}">Size chart</span></div>
+        <div class="sizes">
+          ${Object.entries(p.sizes).map(([s,n]) => n > 0
+            ? `<button class="size ${state.pm.size === s ? 'on' : ''}" data-action="pm-size" data-v="${esc(s)}">${esc(s)}${n <= 3 ? `<small>${n} left</small>` : ''}</button>`
+            : `<button class="size" disabled>${esc(s)}<small>sold out</small></button>`).join('')}
+        </div>
+      </div>
+      <div class="pm-actions">
+        <div class="qty" style="border-radius:99px">
+          <button data-action="pm-qty" data-d="-1">−</button><span>${state.pm.qty}</span><button data-action="pm-qty" data-d="1">+</button>
+        </div>
+        <button class="btn ${stock ? 'btn--solid' : 'btn--ghost-dark'}" data-action="pm-add" ${stock ? '' : 'disabled'}>${stock ? 'Add to bag' : 'Sold out'}</button>
+      </div>
+      <div class="pm-meta">
+        <div><b>Fabric</b><span>${esc(p.fabric)}</span></div>
+        <div><b>Care</b><span>${esc(p.care)}</span></div>
+        <div><b>Delivery</b><span>Cash on delivery · free in Hyderabad</span></div>
+      </div>
+    </div>
+  </div>`);
+}
+
+function openChart(id){
+  const p = findProduct(id); if (!p) return;
+  openModal(`
+  <div class="chart-box">
+    <h3>Size chart</h3>
+    <p>${esc(p.title)} · measurements in inches, garment laid flat. Between sizes? We recommend sizing up.</p>
+    <table class="chart-table">
+      <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th></tr></thead>
+      <tbody>${(p.chart || DEFAULT_CHART).map(r => `<tr><td><b>${esc(r.size)}</b></td><td>${esc(r.chest)}"</td><td>${esc(r.length)}"</td><td>${esc(r.sleeve)}"</td></tr>`).join('')}</tbody>
+    </table>
+    <p class="chart-note">Still unsure? WhatsApp <b>+92 315 3755007</b> with your height and usual fit — we'll tell you exactly what to take.</p>
+  </div>`, true);
+}
+
+const PAY_ICONS = {
+  cash: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 8v0M18 16v0"/></svg>`,
+  bank: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 4l9 6.5"/><path d="M5 10.5V19M9.5 10.5V19M14.5 10.5V19M19 10.5V19"/><path d="M3 19h18"/></svg>`,
+  card: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="2.5" y="5.5" width="19" height="13" rx="2.2"/><path d="M2.5 10h19"/></svg>`,
+};
+const PAY_METHODS = [
+  { id:'cod', label:'Cash on delivery', sub:'Pay when it arrives', icon:'cash' },
+  { id:'easypaisa', label:'EasyPaisa', sub:'Mobile wallet transfer', brand:'easypaisa' },
+  { id:'jazzcash', label:'JazzCash', sub:'Mobile wallet transfer', brand:'jazzcash' },
+  { id:'bank', label:'Bank transfer', sub:'Direct to our account', icon:'bank' },
+  { id:'card', label:'Debit / credit card', sub:'Coming soon', icon:'card', disabled:true },
+];
+function needsRef(method){ return method === 'easypaisa' || method === 'jazzcash' || method === 'bank'; }
+
+function payMethodPanel(method){
+  if (method === 'cod'){
+    return `<div class="pay-info"><p>Pay in cash when your order reaches your door. We'll call to confirm before we dispatch it.</p></div>`;
+  }
+  if (method === 'easypaisa' || method === 'jazzcash'){
+    const num = method === 'easypaisa' ? EASYPAISA_NUMBER : JAZZCASH_NUMBER;
+    const name = method === 'easypaisa' ? 'EasyPaisa' : 'JazzCash';
+    const brandMark = method === 'easypaisa' ? 'easy<b>paisa</b>' : '<b>Jazz</b>Cash';
+    const amount = fmt(cartTotal());
+    return `
+    <div class="pay-info">
+      <span class="pay-brand pay-brand--${method} pay-brand--lg">${brandMark}</span>
+      <p>Send <b>${amount}</b> to our ${name} account below, then enter the transaction ID (or the number you sent from) so we can confirm it.</p>
+      <div class="pay-num">
+        <span class="mono">${esc(num)}</span>
+        <button type="button" class="mini-btn" data-action="copy-pay-num" data-num="${esc(num.replace(/\s/g,''))}">Copy number</button>
+      </div>
+      <div class="pay-num">
+        <span class="mono">${amount}</span>
+        <button type="button" class="mini-btn" data-action="copy-pay-num" data-num="${esc(String(cartTotal()))}">Copy amount</button>
+      </div>
+      <div class="field">
+        <label>${name} transaction ID / sender number *</label>
+        <input name="paymentRef" required placeholder="e.g. TXN12345678 or 03XX XXXXXXX" />
+      </div>
+    </div>`;
+  }
+  if (method === 'bank'){
+    const placeholder = BANK_DETAILS.account.startsWith('Add your');
+    if (placeholder){
+      return `<div class="pay-info">
+        <p>Bank transfer details aren't set up on the site yet — message us on WhatsApp and we'll send you the account details directly.</p>
+        <a class="btn btn--ghost-dark wfull" href="https://wa.me/923153755007?text=${encodeURIComponent('Hi, I want to pay by bank transfer for my order — please send account details.')}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+        <div class="field" style="margin-top:1rem"><label>Bank reference (once you have it) *</label><input name="paymentRef" required placeholder="Transaction reference" /></div>
+      </div>`;
+    }
+    return `
+    <div class="pay-info">
+      <p>Transfer the total amount to the account below, then enter your transfer reference so we can confirm it.</p>
+      <div class="pay-bank">
+        <div><span>Bank</span><b>${esc(BANK_DETAILS.bank)}</b></div>
+        <div><span>Account title</span><b>${esc(BANK_DETAILS.title)}</b></div>
+        <div><span>Account / IBAN</span><b class="mono">${esc(BANK_DETAILS.account)}</b></div>
+      </div>
+      <div class="field"><label>Transfer reference *</label><input name="paymentRef" required placeholder="Bank reference / last 4 digits" /></div>
+    </div>`;
+  }
+  return '';
+}
+
+function payMethodsGrid(active){
+  return `<div class="pay-grid">
+    ${PAY_METHODS.map(m => `
+    <button type="button" class="pay-card ${active === m.id ? 'on' : ''} ${m.disabled ? 'disabled' : ''}" data-action="${m.disabled ? 'pay-soon' : 'co-method'}" data-v="${m.id}">
+      ${m.brand ? `<span class="pay-brand pay-brand--${m.brand}">${m.brand === 'easypaisa' ? 'easy<b>paisa</b>' : '<b>Jazz</b>Cash'}</span>` : `<span class="pay-icon">${PAY_ICONS[m.icon]}</span>`}
+      <span class="pay-text"><b>${esc(m.label)}</b><small>${esc(m.sub)}</small></span>
+      ${m.disabled ? `<span class="pay-soon-tag">Soon</span>` : ''}
+    </button>`).join('')}
+  </div>
+  <div class="pay-network-badges">
+    <span class="card-chip card-chip--visa">VISA</span>
+    <span class="card-chip card-chip--mc"><i></i><i></i></span>
+    <span class="card-chip card-chip--upay">UnionPay</span>
+  </div>`;
+}
+
+function renderCheckoutModal(){
+  const method = state.checkout.method;
+  return `
+  <div class="co">
+    <h3>Checkout</h3>
+    <p class="co-sub">Choose how you'd like to pay — we'll confirm your order right after.</p>
+    <form data-action="place-order">
+      <div class="co-grid">
+        <div class="field"><label>Full name *</label><input name="name" required placeholder="e.g. Ali Raza" /></div>
+        <div class="field"><label>Phone *</label><input name="phone" required placeholder="03XX XXXXXXX" pattern="[0-9+\\-\\s]{10,15}" /></div>
+        <div class="field field--full"><label>Delivery address *</label><textarea name="address" required placeholder="House, street, area"></textarea></div>
+        <div class="field"><label>City *</label><input name="city" required placeholder="Hyderabad" value="Hyderabad" /></div>
+        <div class="field"><label>Order notes</label><input name="notes" placeholder="Optional" /></div>
+      </div>
+      <div class="co-pay">
+        <label class="co-pay-label">Payment method</label>
+        ${payMethodsGrid(method)}
+        <input type="hidden" name="payment" value="${esc(method)}" />
+        ${payMethodPanel(method)}
+      </div>
+      <div class="co-summary">
+        ${state.cart.map(i => { const p = findProduct(i.id); return `<div class="row"><span>${esc(p.title)} · ${esc(i.size)} × ${i.qty}</span><span>${fmt(p.price * i.qty)}</span></div>`; }).join('')}
+        <div class="row"><span>Delivery</span><span>FREE (Hyderabad)</span></div>
+        <div class="row total"><span>Total</span><span>${fmt(cartTotal())}</span></div>
+      </div>
+      <button class="btn btn--solid wfull" type="submit">Place order · ${fmt(cartTotal())}</button>
+    </form>
+  </div>`;
+}
+
+function openCheckout(){
+  if (!state.cart.length) return;
+  state.modal = { type:'checkout' };
+  state.checkout = { method:'cod' };
+  openModal(renderCheckoutModal(), true);
+}
+
+function placeOrder(fd){
+  const method = fd.get('payment') || 'cod';
+  const payLabel = (PAY_METHODS.find(m => m.id === method) || {}).label || 'Cash on delivery';
+  const order = {
+    id: 'QO-' + String(Date.now()).slice(-6),
+    date: new Date().toLocaleString('en-PK', { dateStyle:'medium', timeStyle:'short' }),
+    customer: { name: fd.get('name'), phone: fd.get('phone'), address: fd.get('address'), city: fd.get('city'), notes: fd.get('notes') || '' },
+    items: state.cart.map(i => { const p = findProduct(i.id); return { id:i.id, title:p.title, size:i.size, qty:i.qty, price:p.price }; }),
+    total: cartTotal(),
+    payment: { method, label: payLabel, ref: fd.get('paymentRef') || '', status: method === 'cod' ? 'Pay on delivery' : 'Pending verification' },
+  };
+  order.items.forEach(it => { const p = findProduct(it.id); if (p) p.sizes[it.size] = Math.max(0, Number(p.sizes[it.size]) - it.qty); });
+  state.orders.unshift(order);
+  state.cart = [];
+  persistProducts(); persistOrders(); persistCart(); renderDrawer();
+  const payCopy = method === 'cod'
+    ? `We'll call <b>${esc(order.customer.phone)}</b> shortly to confirm, then dispatch. Pay in cash when it arrives.`
+    : `We're verifying your ${esc(payLabel)} payment (ref: <b>${esc(order.payment.ref)}</b>) — you'll get a confirmation call on <b>${esc(order.customer.phone)}</b> shortly.`;
+  const ownerMsgLines = [
+    `New order ${order.id}`,
+    `${order.customer.name} · ${order.customer.phone}`,
+    `${order.customer.address}, ${order.customer.city}`,
+    ``,
+    ...order.items.map(it => `${it.title} (${it.size}) x${it.qty} — ${fmt(it.price * it.qty)}`),
+    ``,
+    `Total: ${fmt(order.total)}`,
+    `Payment: ${payLabel}${order.payment.ref ? ' — ref: ' + order.payment.ref : ''}`,
+    order.customer.notes ? `Notes: ${order.customer.notes}` : '',
+  ].filter(Boolean).join('\n');
+  const ownerWaUrl = `https://wa.me/923153755007?text=${encodeURIComponent(ownerMsgLines)}`;
+  openModal(`
+  <div class="co-success">
+    <div class="seal-big">✓</div>
+    <h3>Shukriya, ${esc(order.customer.name.split(' ')[0])}!</h3>
+    <p>Your order is with us. ${payCopy}</p>
+    <div class="order-id">ORDER ${order.id} · ${fmt(order.total)}</div><br />
+    ${method !== 'cod' ? `<a class="btn btn--solid wfull" href="${ownerWaUrl}" target="_blank" rel="noopener" style="margin-bottom:.6rem">Send payment proof on WhatsApp</a>` : ''}
+    <button class="btn ${method !== 'cod' ? 'btn--ghost-dark' : 'btn--solid'} wfull" data-action="close-modal">Continue shopping</button>
+  </div>`, true);
+  state.modal = { type:'success' };
+  renderRoute(false); // refresh stock counts behind the modal
+  if (method !== 'cod'){
+    const w = window.open(ownerWaUrl, '_blank', 'noopener');
+    if (!w) { /* popup blocked — the button in the modal above still covers this */ }
+  }
+}
+
+let ADMIN_PASS = store.get(K.pass, 'Pakistan110');
+const RECOVERY_PHONE = '0330 2741348';
+const RECOVERY_WA = '923302741348';
+const OTP_RESEND_MS = 45 * 1000;
+const CATS = ['Tees','Oversized','Polos','Henleys','Shirts'];
+const SIZES = ['S','M','L','XL','XXL'];
+
+function maskPhone(p){
+  const total = (p.match(/\d/g) || []).length;
+  let seen = 0;
+  return p.replace(/\d/g, d => { seen++; return seen > total - 3 ? d : '•'; });
+}
+
+function nextId(){
+  const max = state.products.reduce((m,p) => { const n = /^QF-(\d+)$/.exec(p.id); return n ? Math.max(m, +n[1]) : m; }, 0);
+  return 'QF-' + String(max + 1).padStart(2,'0');
+}
+
+function renderAdmin(){
+  if (!state.admin.authed){
+    const now = Date.now();
+    if (state.admin.lockUntil && now < state.admin.lockUntil){
+      return `<section class="admin-wrap"><div class="wrap">
+        <div class="gate rv in">
+          <span class="gate-icon gate-icon--warn">${GATE_ICONS.warn}</span>
+          <h3>Owner's room locked</h3>
+          <p>Too many wrong passcodes. For security, please wait before trying again.</p>
+          <div class="lock-count mono" id="lock-count" data-until="${state.admin.lockUntil}">${fmtCountdown(state.admin.lockUntil - now)}</div>
+        </div>
+      </div></section>`;
+    }
+    return `<section class="admin-wrap"><div class="wrap">
+      <div class="gate rv in">
+        <span class="brand-seal">Q</span>
+        ${renderGateBody()}
+      </div>
+    </div></section>`;
+  }
+  const tab = state.admin.tab;
+  return `<section class="admin-wrap"><div class="wrap">
+    <div class="admin-head">
+      <div><div class="wp">OWNER'S ROOM</div><h2 class="sec-title">Admin <em>panel</em></h2></div>
+      <div class="admin-tabs">
+        <button class="atab ${tab==='products'?'on':''}" data-action="admin-tab" data-v="products">Products</button>
+        <button class="atab ${tab==='form'?'on':''}" data-action="admin-new">＋ Add product</button>
+        <button class="atab ${tab==='orders'?'on':''}" data-action="admin-tab" data-v="orders">Orders (${state.orders.length})</button>
+        <button class="atab ${tab==='subs'?'on':''}" data-action="admin-tab" data-v="subs">WhatsApp subs (${state.subs.length})</button>
+        <button class="atab" data-action="admin-logout">Log out</button>
+      </div>
+    </div>
+    <div class="admin-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Catalogue, orders and subscribers are saved to this browser. For syncing across devices or staff logins, connect this panel to a real backend.</div>
+    ${tab === 'products' ? adminProducts() : tab === 'orders' ? adminOrders() : tab === 'subs' ? adminSubs() : adminForm()}
+  </div></section>`;
+}
+
+const GATE_ICONS = {
+  lock: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4.5" y="10.5" width="15" height="10" rx="2.4"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.2" r="1.4" fill="currentColor" stroke="none"/></svg>`,
+  shield: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3 4.5 5.8v5.4c0 5 3.3 8.6 7.5 9.8 4.2-1.2 7.5-4.8 7.5-9.8V5.8L12 3Z"/></svg>`,
+  chat: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 11.5a8.5 8.5 0 0 1-12.4 7.6L4 20l1.1-4.4A8.5 8.5 0 1 1 21 11.5Z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/></svg>`,
+  key: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="8" cy="15" r="4"/><path d="M11 12 19 4M16 5.5 18 7.5M19 4v3.5h-3.5"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.5 9.5 17 19 7"/></svg>`,
+  warn: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>`,
+};
+function gateIcon(name){ return `<span class="gate-icon">${GATE_ICONS[name]}</span>`; }
+
+function gateSteps(active){
+  const steps = ['confirm','otp','newpass'];
+  const i = steps.indexOf(active);
+  return `<div class="gate-steps">${steps.map((s, idx) => `<span class="gs-dot ${idx < i ? 'done' : ''} ${idx === i ? 'on' : ''}"></span>`).join('')}</div>`;
+}
+
+function renderGateBody(){
+  const r = state.admin.reset;
+  const err = r.err ? `<div class="err">${gateIcon('warn')}<span>${esc(r.err)}</span></div>` : '';
+
+  if (!r.step){
+    return `
+      ${gateIcon('lock')}
+      <h3>Owner's room</h3>
+      <p>Enter the admin passcode to manage products, stock and orders.</p>
+      <form data-action="admin-login">
+        <div class="pass-field">
+          <input type="${state.admin.reset.showPass ? 'text' : 'password'}" id="gate-pass" placeholder="Passcode" autocomplete="off" />
+          <button type="button" class="pass-eye" data-action="gate-toggle-pass" aria-label="Show passcode">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <button class="btn btn--solid" type="submit">Enter the room</button>
+      </form>
+      <div class="err" id="gate-err"></div>
+      <a class="gate-link" href="#" data-action="reset-forgot">Forgot passcode?</a>`;
+  }
+
+  if (r.step === 'confirm'){
+    return `
+      ${gateIcon('shield')}
+      ${gateSteps('confirm')}
+      <h3>Recover access</h3>
+      <p>We'll message a one-time code to the WhatsApp number on file for this store:</p>
+      <p class="gate-recovery-num mono">${esc(maskPhone(RECOVERY_PHONE))}</p>
+      <form data-action="reset-send-otp" class="gate-form-col">
+        <button class="btn btn--solid" type="submit">${gateIcon('chat')}Send code on WhatsApp</button>
+      </form>
+      ${err}
+      <a class="gate-link" href="#" data-action="reset-cancel">Back to login</a>`;
+  }
+
+  if (r.step === 'otp'){
+    const now = Date.now();
+    const cooldown = Math.max(0, r.otpSentAt + OTP_RESEND_MS - now);
+    return `
+      ${gateIcon('chat')}
+      ${gateSteps('otp')}
+      <h3>Enter the code</h3>
+      <p>We opened WhatsApp with your 6-digit code addressed to <b>${esc(maskPhone(RECOVERY_PHONE))}</b>. Hit send in WhatsApp, then copy the code back here.</p>
+      <form data-action="reset-verify-otp" class="gate-form-col">
+        <input type="text" class="otp-input mono" id="reset-otp-input" placeholder="• • • • • •" inputmode="numeric" maxlength="6" autocomplete="off" />
+        <button class="btn btn--solid" type="submit">Verify code</button>
+      </form>
+      ${err}
+      <div class="gate-resend" id="gate-resend" data-cooldown="${r.otpSentAt + OTP_RESEND_MS}">
+        ${cooldown > 0
+          ? `Didn't get it? Resend in <span class="mono" id="resend-count">${fmtCountdown(cooldown)}</span>`
+          : `<a href="#" data-action="reset-send-otp">Resend the code on WhatsApp</a>`}
+      </div>
+      <a class="gate-link" href="#" data-action="reset-cancel">Back to login</a>`;
+  }
+
+  if (r.step === 'newpass'){
+    return `
+      ${gateIcon('key')}
+      ${gateSteps('newpass')}
+      <h3>Set a new passcode</h3>
+      <p>Code verified. Choose a fresh passcode for the owner's room.</p>
+      <form data-action="reset-set-pass" class="gate-form-col">
+        <input type="password" id="reset-pass1" placeholder="New passcode" autocomplete="off" />
+        <input type="password" id="reset-pass2" placeholder="Confirm new passcode" autocomplete="off" />
+        <button class="btn btn--solid" type="submit">Save passcode</button>
+      </form>
+      ${err}
+      <a class="gate-link" href="#" data-action="reset-cancel">Back to login</a>`;
+  }
+
+  if (r.step === 'done'){
+    return `
+      <span class="gate-icon gate-icon--ok">${GATE_ICONS.check}</span>
+      <h3>Passcode updated</h3>
+      <p>Your owner's room is secured with the new passcode. Log in below to continue.</p>
+      <a class="btn btn--solid" href="#" data-action="reset-cancel">Back to login</a>`;
+  }
+}
+
+function adminProducts(){
+  const low = state.products.filter(p => { const t = totalStock(p); return t > 0 && t <= 8; }).length;
+  const out = state.products.filter(p => totalStock(p) === 0).length;
+  return `
+  <div class="stat-grid">
+    <div class="stat"><div class="n">${state.products.length}</div><div class="l">Products live</div></div>
+    <div class="stat"><div class="n warn">${low}</div><div class="l">Low stock</div></div>
+    <div class="stat"><div class="n warn">${out}</div><div class="l">Sold out</div></div>
+    <div class="stat"><div class="n">${state.orders.length}</div><div class="l">Orders received</div></div>
+    <div class="stat"><div class="n">${state.subs.length}</div><div class="l">WhatsApp subs</div></div>
+  </div>
+  <div class="table-wrap"><table class="atable">
+    <thead><tr><th></th><th>Code</th><th>Product</th><th>Price (PKR)</th><th>Stock</th><th>Flags</th><th>Actions</th></tr></thead>
+    <tbody>
+      ${state.products.map(p => { const t = totalStock(p); return `<tr>
+        <td><img src="${prodImgs(p)[0]}" alt="" /></td>
+        <td class="c">${esc(p.id)}</td>
+        <td><div class="t">${esc(p.title)}</div><div class="c">${esc(p.cat)} · ${esc(p.colorway.name)}</div></td>
+        <td class="c">${fmt(p.price)}${p.compareAt > p.price ? ` <s style="color:var(--ink-dim)">${fmt(p.compareAt)}</s>` : ''}</td>
+        <td><span class="stock-pill ${t <= 8 ? 'low' : ''}">${t} pcs</span></td>
+        <td class="c">${[p.featured && 'FEATURED', p.isNew && 'NEW', p.compareAt > p.price && 'SALE'].filter(Boolean).join(' · ') || '—'}</td>
+        <td><div class="row-actions">
+          <button class="mini-btn" data-action="admin-edit" data-id="${esc(p.id)}">Edit</button>
+          <button class="mini-btn danger" data-action="admin-del" data-id="${esc(p.id)}">Delete</button>
+        </div></td>
+      </tr>`; }).join('')}
+    </tbody>
+  </table></div>
+  <div class="form-actions"><button class="btn btn--ghost-dark" data-action="admin-reset">Reset demo catalogue</button></div>`;
+}
+
+function adminOrders(){
+  if (!state.orders.length) return `<div class="empty"><span class="serif">No orders yet.</span>Orders placed through the storefront checkout will appear here.</div>`;
+  return state.orders.map(o => {
+    const pay = o.payment || { label:'Cash on delivery', status:'Pay on delivery', ref:'' };
+    return `
+    <div class="order-card">
+      <div class="oh">
+        <span class="oid">${esc(o.id)}</span>
+        <span class="pay-chip ${pay.status === 'Pending verification' ? 'pending' : ''}">${esc(pay.label)}${pay.ref ? ' · ' + esc(pay.ref) : ''} — ${esc(pay.status)}</span>
+        <span class="od">${esc(o.date)}</span>
+      </div>
+      <div class="items">
+        <b>${esc(o.customer.name)}</b> · ${esc(o.customer.phone)} · ${esc(o.customer.address)}, ${esc(o.customer.city)}
+        ${o.customer.notes ? `<br />Note: ${esc(o.customer.notes)}` : ''}<br />
+        ${o.items.map(i => `${esc(i.title)} (${esc(i.size)}) × ${i.qty}`).join(' · ')}
+      </div>
+      <div class="tot">Total ${fmt(o.total)}</div>
+    </div>`;
+  }).join('') +
+  `<div class="form-actions"><button class="btn btn--ghost-dark" data-action="orders-clear">Clear all orders</button></div>`;
+}
+
+function adminSubs(){
+  if (!state.subs.length) return `<div class="empty"><span class="serif">No subscribers yet.</span>Phone numbers submitted through the "Join WhatsApp Group" form will appear here.</div>`;
+  return `
+  <div class="table-wrap"><table class="atable">
+    <thead><tr><th>#</th><th>Phone number</th><th>Submitted</th></tr></thead>
+    <tbody>
+      ${state.subs.map((s,i) => `<tr>
+        <td class="c">${state.subs.length - i}</td>
+        <td class="t">${esc(s.phone)}</td>
+        <td class="c">${esc(s.date)}</td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>
+  <div class="form-actions">
+    <button class="btn btn--ghost-dark" data-action="subs-copy">Copy all numbers</button>
+    <button class="btn btn--ghost-dark" data-action="subs-clear">Clear all subscribers</button>
+  </div>`;
+}
+
+function adminForm(){
+  const p = state.admin.editing ? findProduct(state.admin.editing) : null;
+  const v = (val) => esc(val ?? '');
+  const imgs = p ? (p.imgs && p.imgs.length ? p.imgs : [p.img]).join('\n') : '';
+  const chart = (p && p.chart && p.chart.length ? p.chart : DEFAULT_CHART).map(r => ({...r}));
+  return `
+  <form class="aform" data-action="admin-save">
+    <h3>${p ? 'Edit — ' + esc(p.title) : 'Add a new product'}</h3>
+    <input type="hidden" name="pid" value="${p ? esc(p.id) : ''}" />
+    <div class="fgrid">
+      <div class="field"><label>Title *</label><input name="title" required value="${v(p && p.title)}" placeholder="e.g. Nomad Crew Tee" /></div>
+      <div class="field"><label>Subtitle</label><input name="sub" value="${v(p && p.sub)}" placeholder="e.g. Heavyweight everyday crew" /></div>
+      <div class="field field--full"><label>Description *</label><textarea name="desc" required placeholder="Fabric, fit and feel — sell the story.">${v(p && p.desc)}</textarea></div>
+      <div class="field"><label>Category</label><select name="cat">${CATS.map(c => `<option ${p && p.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+      <div class="field"><label>Fabric</label><input name="fabric" value="${v(p && p.fabric)}" placeholder="100% combed cotton · 220 GSM" /></div>
+      <div class="field field--full"><label>Care instructions</label><input name="care" value="${v(p && p.care) || CARE}" /></div>
+      <div class="field"><label>Price (PKR) *</label><input name="price" required inputmode="numeric" value="${p ? p.price : ''}" placeholder="2450" /></div>
+      <div class="field"><label>Compare-at price (PKR) — 0 for none</label><input name="compareAt" inputmode="numeric" value="${p ? p.compareAt || 0 : 0}" /></div>
+      <div class="fsec"><h4>Colourway</h4>
+        <div class="color-row">
+          <div class="field" style="flex:1"><label>Colour name</label><input name="cname" value="${v(p && p.colorway.name)}" placeholder="e.g. Qafla Maroon" /></div>
+          <div class="field"><label>Swatch</label><input type="color" name="chex" value="${p ? esc(p.colorway.hex) : '#C9A99A'}" /></div>
+        </div>
+      </div>
+      <div class="fsec"><h4>Images — one Unsplash photo ID or full image URL per line *</h4>
+        <div class="field"><textarea name="images" required placeholder="1521572163474-6864f9cf17ab&#10;https://images.unsplash.com/photo-…">${v(imgs)}</textarea></div>
+      </div>
+      <div class="fsec"><h4>Stock per size</h4>
+        <div class="stock-grid">
+          ${SIZES.map(s => `<div class="field"><label>${s}</label><input name="sz_${s}" inputmode="numeric" value="${p ? Number(p.sizes[s] || 0) : 10}" /></div>`).join('')}
+        </div>
+      </div>
+      <div class="fsec"><h4>Size chart (inches)</h4>
+        <table class="chart-edit"><thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th><th></th></tr></thead>
+        <tbody id="chart-edit">
+          ${chart.map(r => `<tr data-row>
+            <td><input name="c_size" value="${esc(r.size)}" /></td>
+            <td><input name="c_chest" value="${esc(r.chest)}" /></td>
+            <td><input name="c_length" value="${esc(r.length)}" /></td>
+            <td><input name="c_sleeve" value="${esc(r.sleeve)}" /></td>
+            <td><button type="button" class="mini-btn danger" data-action="chart-del">✕</button></td>
+          </tr>`).join('')}
+        </tbody></table>
+        <button type="button" class="mini-btn" data-action="chart-add">＋ Add row</button>
+      </div>
+      <div class="fsec"><h4>Flags</h4>
+        <label class="check-line"><input type="checkbox" name="featured" ${p && p.featured ? 'checked' : ''} /> Featured (Customer favourites)</label>
+        <label class="check-line"><input type="checkbox" name="isNew" ${!p || p.isNew ? 'checked' : ''} /> New arrival</label>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn--solid" type="submit">${p ? 'Save changes' : 'Add product'}</button>
+      <button class="btn btn--ghost-dark" type="button" data-action="admin-cancel">Cancel</button>
+    </div>
+  </form>`;
+}
+
+function saveProduct(f){
+  const fd = new FormData(f);
+  const price = parseInt(String(fd.get('price')).replace(/[^\d]/g,''), 10);
+  const compareAt = parseInt(String(fd.get('compareAt')).replace(/[^\d]/g,''), 10) || 0;
+  if (!price || price <= 0){ toast('Enter a valid price in PKR'); return; }
+  const imgLines = String(fd.get('images') || '').split('\n').map(s => s.trim()).filter(Boolean);
+  if (!imgLines.length){ toast('Add at least one image'); return; }
+  const sizes = {}; SIZES.forEach(s => sizes[s] = Math.max(0, parseInt(String(fd.get('sz_' + s)).replace(/[^\d]/g,''), 10) || 0));
+  const chart = $$('#chart-edit tr[data-row]').map(tr => ({
+    size: tr.querySelector('[name=c_size]').value.trim(),
+    chest: tr.querySelector('[name=c_chest]').value.trim(),
+    length: tr.querySelector('[name=c_length]').value.trim(),
+    sleeve: tr.querySelector('[name=c_sleeve]').value.trim(),
+  })).filter(r => r.size);
+  const pid = String(fd.get('pid') || '');
+  const old = pid ? findProduct(pid) : null;
+  const prod = {
+    id: pid || nextId(),
+    title: String(fd.get('title')).trim(),
+    sub: String(fd.get('sub') || '').trim(),
+    desc: String(fd.get('desc')).trim(),
+    cat: String(fd.get('cat')),
+    fabric: String(fd.get('fabric') || '').trim() || '100% cotton',
+    care: String(fd.get('care') || CARE).trim(),
+    price, compareAt,
+    colorway: { name: String(fd.get('cname') || 'Standard').trim() || 'Standard', hex: String(fd.get('chex') || '#C9A99A') },
+    img: imgLines[0], imgs: imgLines,
+    isNew: !!fd.get('isNew'), featured: !!fd.get('featured'),
+    sizes, chart: chart.length ? chart : DEFAULT_CHART.map(r => ({...r})),
+  };
+  if (old) Object.assign(old, prod); else state.products.unshift(prod);
+  persistProducts();
+  state.admin.tab = 'products'; state.admin.editing = null;
+  toast(old ? 'Product updated' : 'Product added to the shop');
+  renderRoute(false);
+}
+
+function currentRoute(){
+  const h = location.hash || '#/';
+  if (h.startsWith('#/admin')) return 'admin';
+  if (h.startsWith('#/shop')) return 'shop';
+  return 'home';
+}
+
+let revealObserver = null;
+function initReveals(){
+  if (revealObserver) revealObserver.disconnect();
+  revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); revealObserver.unobserve(en.target); } });
+  }, { threshold: .12 });
+  $$('.rv').forEach(el => revealObserver.observe(el));
+}
+
+function fmtCountdown(ms){
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+}
+let lockTimer = null;
+function initLockCountdown(){
+  if (lockTimer){ clearInterval(lockTimer); lockTimer = null; }
+  const el = $('#lock-count'); if (!el) return;
+  const until = +el.dataset.until;
+  lockTimer = setInterval(() => {
+    const remain = until - Date.now();
+    if (remain <= 0){
+      clearInterval(lockTimer); lockTimer = null;
+      state.admin.lockUntil = 0; state.admin.attempts = 0; persistLoginLock();
+      renderRoute(false);
+    } else {
+      el.textContent = fmtCountdown(remain);
+    }
+  }, 250);
+}
+
+let resendTimer = null;
+function initResendCountdown(){
+  if (resendTimer){ clearInterval(resendTimer); resendTimer = null; }
+  const wrap = $('#gate-resend'); if (!wrap) return;
+  const until = +wrap.dataset.cooldown;
+  resendTimer = setInterval(() => {
+    const remain = until - Date.now();
+    const cEl = $('#resend-count');
+    if (remain <= 0){
+      clearInterval(resendTimer); resendTimer = null;
+      if (state.admin.reset.step === 'otp') renderRoute(false);
+    } else if (cEl){
+      cEl.textContent = fmtCountdown(remain);
+    }
+  }, 250);
+}
+
+function renderRoute(scroll = true){
+  const r = currentRoute();
+  const view = $('#view');
+  if (r === 'home') view.innerHTML = renderHome();
+  else if (r === 'shop') view.innerHTML = renderShop();
+  else view.innerHTML = renderAdmin();
+
+  $$('#nav-links a').forEach(a => {
+    const k = a.dataset.navlink;
+    a.classList.toggle('active', (r === 'home' && k === 'home') || (r === 'shop' && k === 'shop'));
+  });
+  $('#nav-links').classList.remove('open');
+
+  const anchor = (/^#\/(#.+)$/.exec(location.hash) || [])[1];
+  if (anchor){
+    setTimeout(() => { const el = $(anchor); el && el.scrollIntoView({ behavior:'smooth' }); }, 60);
+  } else if (scroll){
+    window.scrollTo({ top: 0 });
+  }
+  initReveals();
+  initLockCountdown();
+  initResendCountdown();
+}
+
+function refreshShopResults(){
+  const box = $('#shop-results'); if (!box) return;
+  const list = filteredProducts();
+  box.innerHTML = list.length
+    ? `<div class="grid">${list.map((p,i) => cardHTML(p, i % 4)).join('')}</div>`
+    : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter — or call <b>+92 315 3755007</b> and we'll source it for you.</div>`;
+  const note = $('.result-note'); if (note) note.textContent = `${list.length} OF ${state.products.length} STYLES`;
+  $$('#cat-chips .chip, [data-action="f-size"]').forEach(ch => {
+    const isCat = ch.dataset.action === 'f-cat';
+    ch.classList.toggle('on', (isCat ? state.filters.cat : state.filters.size) === ch.dataset.v);
+  });
+  initReveals();
+}
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-action]');
+  if (!t) return;
+  const a = t.dataset.action, id = t.dataset.id;
+  if (t.tagName === 'A' && t.getAttribute('href') === '#') e.preventDefault();
+
+  if (a === 'open-product') openProduct(id);
+  else if (a === 'wish'){ toggleWish(id, t); }
+  else if (a === 'pm-thumb'){ state.pm.img = +t.dataset.i; renderProductModal(findProduct(state.modal.id)); }
+  else if (a === 'pm-size'){ state.pm.size = t.dataset.v; renderProductModal(findProduct(state.modal.id)); }
+  else if (a === 'pm-qty'){ state.pm.qty = Math.min(10, Math.max(1, state.pm.qty + (+t.dataset.d))); renderProductModal(findProduct(state.modal.id)); }
+  else if (a === 'pm-add'){
+    if (!state.pm.size){ toast('Select a size first'); return; }
+    addToCart(state.modal.id, state.pm.size, state.pm.qty);
+    closeModal(); openCart();
+  }
+  else if (a === 'open-chart') openChart(id);
+  else if (a === 'close-modal') closeModal();
+  else if (a === 'qty'){
+    const i = +t.dataset.idx, line = state.cart[i], p = findProduct(line.id);
+    const max = Number((p.sizes || {})[line.size] || 0);
+    line.qty += (+t.dataset.d);
+    if (line.qty < 1) line.qty = 1;
+    if (line.qty > max){ line.qty = Math.max(1, max); toast('Only ' + max + ' available in ' + line.size); }
+    persistCart(); renderDrawer();
+  }
+  else if (a === 'remove'){ state.cart.splice(+t.dataset.idx, 1); persistCart(); renderDrawer(); }
+  else if (a === 'checkout'){ closeCart(); openCheckout(); }
+  else if (a === 'close-cart-link') closeCart();
+  else if (a === 'f-cat'){ state.filters.cat = t.dataset.v; refreshShopResults(); }
+  else if (a === 'f-size'){ state.filters.size = t.dataset.v; refreshShopResults(); }
+  else if (a === 'admin-tab'){ state.admin.tab = t.dataset.v; state.admin.editing = null; renderRoute(false); }
+  else if (a === 'admin-new'){ state.admin.tab = 'form'; state.admin.editing = null; renderRoute(false); }
+  else if (a === 'admin-edit'){ state.admin.tab = 'form'; state.admin.editing = id; renderRoute(false); }
+  else if (a === 'admin-del'){
+    const p = findProduct(id);
+    if (confirm('Delete "' + (p ? p.title : id) + '" from the shop?')){
+      state.products = state.products.filter(x => x.id !== id);
+      persistProducts(); toast('Product deleted'); renderRoute(false);
+    }
+  }
+  else if (a === 'admin-cancel'){ state.admin.tab = 'products'; state.admin.editing = null; renderRoute(false); }
+  else if (a === 'admin-reset'){
+    if (confirm('Restore the original 14-product demo catalogue? Your added products will be replaced.')){
+      state.products = SEED_PRODUCTS.map(p => ({...p, imgs:[p.img, ...LIFE.slice(0,2)], chart:p.chart.map(r => ({...r})), sizes:{...p.sizes}}));
+      persistProducts(); toast('Demo catalogue restored'); renderRoute(false);
+    }
+  }
+  else if (a === 'admin-logout'){ state.admin.authed = false; store.set(K.admin, false); renderRoute(false); }
+  else if (a === 'reset-forgot'){ state.admin.reset = { step:'confirm', otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false }; renderRoute(false); }
+  else if (a === 'reset-cancel'){ state.admin.reset = { step:null, otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false }; renderRoute(false); }
+  else if (a === 'orders-clear'){
+    if (confirm('Clear all saved orders?')){ state.orders = []; persistOrders(); renderRoute(false); }
+  }
+  else if (a === 'subs-clear'){
+    if (confirm('Clear all saved WhatsApp subscribers?')){ state.subs = []; persistSubs(); renderRoute(false); }
+  }
+  else if (a === 'subs-copy'){
+    const list = state.subs.map(s => s.phone).join('\n');
+    navigator.clipboard && navigator.clipboard.writeText(list).then(
+      () => toast('Copied ' + state.subs.length + ' number(s)'),
+      () => toast('Could not copy — select the table manually')
+    );
+  }
+  else if (a === 'chart-add'){
+    $('#chart-edit').insertAdjacentHTML('beforeend', `<tr data-row>
+      <td><input name="c_size" placeholder="3XL" /></td><td><input name="c_chest" placeholder="48" /></td>
+      <td><input name="c_length" placeholder="32" /></td><td><input name="c_sleeve" placeholder="10" /></td>
+      <td><button type="button" class="mini-btn danger" data-action="chart-del">✕</button></td></tr>`);
+  }
+  else if (a === 'chart-del'){ t.closest('tr').remove(); }
+  else if (a === 'co-method'){
+    state.checkout.method = t.dataset.v;
+    openModal(renderCheckoutModal(), true);
+  }
+  else if (a === 'pay-soon'){ toast('Card payments are coming soon — try EasyPaisa, JazzCash or cash for now'); }
+  else if (a === 'copy-pay-num'){
+    const num = t.dataset.num;
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(num).then(() => toast('Copied')).catch(() => toast(num));
+    } else { toast(num); }
+  }
+  else if (a === 'auth-switch'){
+    state.auth.view = state.auth.view === 'signup' ? 'signin' : 'signup';
+    state.auth.err = ''; refreshAuthModal();
+  }
+  else if (a === 'auth-toggle-pass'){
+    state.auth.showPass = !state.auth.showPass;
+    refreshAuthModal();
+  }
+  else if (a === 'auth-google') googleSignIn();
+  else if (a === 'auth-facebook') facebookSignIn();
+  else if (a === 'auth-signout'){
+    state.auth.session = null; persistSession(); updateAccountUI();
+    toast('Signed out'); closeModal();
+  }
+  else if (a === 'gate-toggle-pass'){
+    state.admin.reset.showPass = !state.admin.reset.showPass;
+    renderRoute(false);
+    setTimeout(() => { const el = $('#gate-pass'); if (el) el.focus(); }, 0);
+  }
+  else if (a === 'reset-send-otp'){
+    const now = Date.now();
+    const r = state.admin.reset;
+    if (r.otpSentAt && now < r.otpSentAt + OTP_RESEND_MS && r.step === 'otp'){ renderRoute(false); return; }
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const msg = `Qafla Men's Wear — your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
+    const waUrl = `https://wa.me/${RECOVERY_WA}?text=${encodeURIComponent(msg)}`;
+    const win = window.open(waUrl, '_blank', 'noopener');
+    state.admin.reset = { step:'otp', otp, otpSentAt: now, otpTries:0, err:'', showPass:false };
+    toast(win ? 'WhatsApp opened with your code — hit send' : 'Pop-up blocked — allow pop-ups, then resend');
+    renderRoute(false);
+  }
+});
+
+document.addEventListener('submit', e => {
+  const f = e.target.closest('form[data-action]'); if (!f) return;
+  e.preventDefault();
+  const a = f.dataset.action;
+  if (a === 'place-order') placeOrder(new FormData(f));
+  else if (a === 'auth-signin'){
+    const email = $('#auth-email').value.trim();
+    const pass = $('#auth-pass').value;
+    const cust = findCustomer(email);
+    if (!cust || cust.provider !== 'email' || cust.pass !== pass){
+      state.auth.err = 'Email or password is incorrect.'; refreshAuthModal(); return;
+    }
+    state.auth.session = { name: cust.name, email: cust.email, provider:'email', avatar:'' };
+    persistSession(); toast('Welcome back, ' + cust.name.split(' ')[0] + '!'); closeModal(); updateAccountUI();
+  }
+  else if (a === 'auth-signup'){
+    const name = $('#auth-name').value.trim();
+    const email = $('#auth-email').value.trim();
+    const pass = $('#auth-pass').value, pass2 = $('#auth-pass2').value;
+    if (findCustomer(email)){ state.auth.err = 'An account with that email already exists — sign in instead.'; refreshAuthModal(); return; }
+    if (pass !== pass2){ state.auth.err = 'Passwords do not match.'; refreshAuthModal(); return; }
+    if (pass.length < 4){ state.auth.err = 'Password must be at least 4 characters.'; refreshAuthModal(); return; }
+    const cust = { id:'C-' + Date.now().toString(36), name, email, pass, provider:'email', avatar:'', joined: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) };
+    const list = getCustomers(); list.unshift(cust); saveCustomers(list);
+    state.auth.session = { name: cust.name, email: cust.email, provider:'email', avatar:'' };
+    persistSession(); toast('Account created — welcome, ' + name.split(' ')[0] + '!'); closeModal(); updateAccountUI();
+  }
+  else if (a === 'join-whatsapp'){
+    const phone = f.querySelector('[name=phone]').value.trim();
+    if (!phone) return;
+    state.subs.unshift({ phone, date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) });
+    persistSubs();
+    f.reset();
+    if (WHATSAPP_GROUP_LINK){
+      toast('Saved! Opening WhatsApp…');
+      window.open(WHATSAPP_GROUP_LINK, '_blank', 'noopener');
+    } else {
+      toast('Got your number — we\'ll add you as soon as the group link is live');
+    }
+  }
+  else if (a === 'admin-login'){
+    const now = Date.now();
+    if (state.admin.lockUntil && now < state.admin.lockUntil){ renderRoute(false); return; }
+    const pass = $('#gate-pass').value.trim();
+    if (pass === ADMIN_PASS){
+      state.admin.authed = true; state.admin.attempts = 0; state.admin.lockUntil = 0;
+      store.set(K.admin, true); persistLoginLock();
+      toast('Welcome back, boss'); renderRoute(false);
+    } else {
+      state.admin.attempts += 1;
+      if (state.admin.attempts >= MAX_LOGIN_ATTEMPTS){
+        state.admin.lockUntil = now + LOGIN_LOCK_MS;
+        state.admin.attempts = 0;
+        persistLoginLock();
+        renderRoute(false);
+      } else {
+        persistLoginLock();
+        const left = MAX_LOGIN_ATTEMPTS - state.admin.attempts;
+        $('#gate-err').textContent = `Wrong passcode — ${left} attempt${left === 1 ? '' : 's'} left before a 1:30 lockout.`;
+      }
+    }
+  }
+  else if (a === 'admin-save') saveProduct(f);
+  else if (a === 'reset-send-otp'){
+    const now = Date.now();
+    const r = state.admin.reset;
+    if (r.otpSentAt && now < r.otpSentAt + OTP_RESEND_MS && r.step === 'otp'){ renderRoute(false); return; }
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const msg = `Qafla Men's Wear — your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
+    const waUrl = `https://wa.me/${RECOVERY_WA}?text=${encodeURIComponent(msg)}`;
+    const win = window.open(waUrl, '_blank', 'noopener');
+    state.admin.reset = { step:'otp', otp, otpSentAt: now, otpTries:0, err:'', showPass:false };
+    toast(win ? 'WhatsApp opened with your code — hit send' : 'Pop-up blocked — allow pop-ups, then resend');
+    renderRoute(false);
+  }
+  else if (a === 'reset-verify-otp'){
+    const val = $('#reset-otp-input').value.trim();
+    const r = state.admin.reset;
+    if (val && val === r.otp){
+      state.admin.reset = { step:'newpass', otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false };
+      renderRoute(false);
+    } else {
+      r.otpTries = (r.otpTries || 0) + 1;
+      r.err = r.otpTries >= 5 ? 'Too many wrong codes — request a fresh one.' : 'That code doesn\'t match — double-check WhatsApp and try again.';
+      renderRoute(false);
+    }
+  }
+  else if (a === 'reset-set-pass'){
+    const p1 = $('#reset-pass1').value, p2 = $('#reset-pass2').value;
+    if (!p1 || p1.length < 4){
+      state.admin.reset.err = 'Passcode must be at least 4 characters.'; renderRoute(false); return;
+    }
+    if (p1 !== p2){
+      state.admin.reset.err = 'Passcodes do not match.'; renderRoute(false); return;
+    }
+    ADMIN_PASS = p1;
+    store.set(K.pass, ADMIN_PASS);
+    state.admin.reset = { step:'done', otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false };
+    toast('Passcode updated — log in with your new passcode');
+    renderRoute(false);
+  }
+});
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'shop-search'){ state.filters.q = e.target.value; refreshShopResults(); }
+});
+document.addEventListener('change', e => {
+  if (e.target.id === 'shop-sort'){ state.filters.sort = e.target.value; refreshShopResults(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){ closeModal(); closeCart(); }
+});
+
+function openCart(){ renderDrawer(); $('#cart-drawer').classList.add('show'); $('#scrim').classList.add('show'); }
+function closeCart(){ $('#cart-drawer').classList.remove('show'); $('#scrim').classList.remove('show'); }
+
+$('#nav-cart').addEventListener('click', openCart);
+$('#nav-account').addEventListener('click', openAuthModal);
+$('#drawer-close').addEventListener('click', closeCart);
+$('#scrim').addEventListener('click', closeCart);
+$('#modal-scrim').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+$('#nav-burger').addEventListener('click', () => $('#nav-links').classList.toggle('open'));
+$('#nav-links').addEventListener('click', e => { if (e.target.tagName === 'A') $('#nav-links').classList.remove('open'); });
+$('#nav-search').addEventListener('click', () => {
+  if (currentRoute() !== 'shop') location.hash = '#/shop';
+  setTimeout(() => { const s = $('#shop-search'); s && s.focus(); }, 120);
+});
+
+window.addEventListener('hashchange', () => renderRoute());
+let lastScrollY = window.scrollY;
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  $('#nav').classList.toggle('scrolled', y > 8);
+  $('#nav').classList.toggle('nav-hidden', y > 70);
+  lastScrollY = y;
+  const hi = $('#hero-img');
+  if (hi) hi.style.transform = 'translateY(' + Math.min(y * .18, 120) + 'px)';
+}, { passive: true });
+
+renderRoute();
+updateCartCount();
+updateAccountUI();
+renderDrawer();
