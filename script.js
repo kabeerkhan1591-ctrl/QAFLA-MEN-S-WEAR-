@@ -7,15 +7,15 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
 const FACEBOOK_APP_ID  = '1234567890';
 
-// Safe Supabase initialization (fixes duplicate declaration)
+// Safe Supabase client
 let supabase = null;
 
 function initSupabase() {
   if (typeof window.supabase !== 'undefined') {
     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('%cSupabase initialized successfully', 'color: green; font-weight: bold');
+    console.log('✅ Supabase initialized successfully');
   } else {
-    console.error('Supabase SDK not loaded - make sure the CDN script is before script.js in index.html');
+    console.error('❌ Supabase SDK not loaded');
   }
 }
 
@@ -25,16 +25,17 @@ if (document.readyState === 'loading') {
 } else {
   initSupabase();
 }
+
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
 const IMG_STORE = IMG('1441986300917-64674bd600d8', 1200);
 const LIFE = ['1445205170230-053b83016050','1544441893-675973e31985','1489987707025-afc232f7ea0f','1556905055-8f358a7a47b2','1516762689617-e1cffcef479d','1591047139829-d91aecb6caea','1542272604-787c3835535d','1509316785289-025f5b846b35'];
 
 const DEFAULT_CHART = [
-  { size: 'S',   chest: '38', length: '27', sleeve: '7.5' },
-  { size: 'M',   chest: '40', length: '28', sleeve: '8'   },
-  { size: 'L',   chest: '42', length: '29', sleeve: '8.5' },
-  { size: 'XL',  chest: '44', length: '30', sleeve: '9'   },
+  { size: 'S', chest: '38', length: '27', sleeve: '7.5' },
+  { size: 'M', chest: '40', length: '28', sleeve: '8' },
+  { size: 'L', chest: '42', length: '29', sleeve: '8.5' },
+  { size: 'XL', chest: '44', length: '30', sleeve: '9' },
   { size: 'XXL', chest: '46', length: '31', sleeve: '9.5' },
 ];
 const CARE = 'Machine wash cold, inside out · Tumble dry low · Warm iron if needed · Do not bleach';
@@ -76,6 +77,10 @@ const state = {
 // ===== SUPABASE DATA FUNCTIONS =====
 
 async function loadProducts(){
+  if (!supabase) { 
+    console.error('Supabase not ready'); 
+    return; 
+  }
   const { data, error } = await supabase.from('products').select('*').order('id');
   if (error){ console.error('loadProducts error:', error); toast('Could not load products -- check connection'); return; }
   state.products = data.map(p => ({
@@ -97,7 +102,6 @@ async function loadProducts(){
     chart: p.size_chart || DEFAULT_CHART,
   }));
 }
-
 async function loadOrders(){
   const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
   if (error){ console.error('loadOrders error:', error); return; }
