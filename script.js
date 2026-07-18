@@ -1,11 +1,14 @@
 'use strict';
 const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
-const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';   // console.cloud.google.com/apis/credentials
-const FACEBOOK_APP_ID  = '1234567890';   // developers.facebook.com/apps
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas'; 
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
+const FACEBOOK_APP_ID  = '1234567890';
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
-const IMG_HERO  = IMG('1542272604-787c3835535d', 2000); // man in casual streetwear, editorial portrait
-const IMG_STORE  = IMG('1441986300917-64674bd600d8', 1200); // shop rail
+const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
+const IMG_STORE  = IMG('1441986300917-64674bd600d8', 1200);
 const LIFE = ['1445205170230-053b83016050','1544441893-675973e31985','1489987707025-afc232f7ea0f','1556905055-8f358a7a47b2','1516762689617-e1cffcef479d','1591047139829-d91aecb6caea','1542272604-787c3835535d','1509316785289-025f5b846b35'];
 
 const DEFAULT_CHART = [
@@ -18,127 +21,142 @@ const DEFAULT_CHART = [
 const CARE = 'Machine wash cold, inside out · Tumble dry low · Warm iron if needed · Do not bleach';
 
 const WHATSAPP_GROUP_LINK = '';
-
-// ---- Payments — update these with your real account details ----
 const EASYPAISA_NUMBER = '0332 0463476';
-const JAZZCASH_NUMBER  = '0332 0463476'; // update if your JazzCash account uses a different number
+const JAZZCASH_NUMBER  = '0332 0463476';
 const BANK_DETAILS = { bank:'Add your bank name', title:'Add your account title', account:'Add your account / IBAN number' };
 
-const SEED_PRODUCTS = [
-  { id:'QF-01', title:'Nomad Crew Tee', sub:'Heavyweight everyday crew neck', cat:'Tees',
-    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2450, compareAt:2950,
-    colorway:{name:'Dune White', hex:'#EDE6DA'}, img:'1521572163474-6864f9cf17ab',
-    isNew:true, featured:true, sizes:{S:8,M:12,L:10,XL:6,XXL:4}, chart:DEFAULT_CHART,
-    desc:'The tee that started the caravan. A dense 220 GSM combed-cotton jersey with a structured collar that keeps its shape wash after wash — cut slightly relaxed through the body for all-day ease.' },
-  { id:'QF-02', title:'Caravan Oversized Tee', sub:'Drop-shoulder boxy fit', cat:'Oversized',
-    fabric:'100% carded open-end cotton · 240 GSM', care:CARE, price:2850, compareAt:0,
-    colorway:{name:'Clay Rust', hex:'#B4654A'}, img:'1552374196-c4e7ffc6e126',
-    isNew:false, featured:true, sizes:{S:5,M:9,L:7,XL:4,XXL:2}, chart:DEFAULT_CHART,
-    desc:'A boxy, drop-shoulder silhouette in a dry-hand 240 GSM jersey. Garment-washed for a lived-in feel from the first wear — the colour deepens beautifully with age.' },
-  { id:'QF-03', title:'Latifabad Classic Tee', sub:'The local favourite', cat:'Tees',
-    fabric:'100% combed cotton · 200 GSM', care:CARE, price:1950, compareAt:2450,
-    colorway:{name:'Ink Black', hex:'#26211D'}, img:'1562157873-818bc0726f68',
-    isNew:false, featured:false, sizes:{S:10,M:14,L:0,XL:8,XXL:5}, chart:DEFAULT_CHART,
-    desc:'Named after our home neighbourhood. A lighter 200 GSM everyday tee with a clean classic fit — the one our regulars buy three at a time.' },
-  { id:'QF-04', title:'Dune Trio Tee Pack', sub:'Three everyday crews, one price', cat:'Tees',
-    fabric:'100% combed cotton · 200 GSM', care:CARE, price:3450, compareAt:0,
-    colorway:{name:'Bone Mix', hex:'#E8DFD2'}, img:'1581655353564-df123a1eb820',
-    isNew:true, featured:false, sizes:{S:6,M:8,L:6,XL:4,XXL:3}, chart:DEFAULT_CHART,
-    desc:'Three essential crew tees in bone, sand and white — pre-washed, pre-shrunk and ready to rotate through the week. The smart way to stock a drawer.' },
-  { id:'QF-05', title:'Mirani Heritage Polo', sub:'Soft piqué · pearl buttons', cat:'Polos',
-    fabric:'Cotton piqué · 240 GSM', care:CARE, price:2950, compareAt:3500,
-    colorway:{name:'Camel', hex:'#C8A27A'}, img:'1603252109303-2751441dd157',
-    isNew:false, featured:false, sizes:{S:7,M:9,L:6,XL:5,XXL:0}, chart:DEFAULT_CHART,
-    desc:'A refined piqué polo with a flat-knit collar and genuine mother-of-pearl buttons. Smart enough for dinner, easy enough for every day.' },
-  { id:'QF-06', title:'Shaheen Piqué Polo', sub:'Signature maroon piqué', cat:'Polos',
-    fabric:'Cotton piqué · 240 GSM', care:CARE, price:3250, compareAt:0,
-    colorway:{name:'Qafla Maroon', hex:'#5C2A1E'}, img:'1586363104862-3a5e2ab60d99',
-    isNew:false, featured:true, sizes:{S:6,M:10,L:8,XL:5,XXL:3}, chart:DEFAULT_CHART,
-    desc:'Our signature polo in the house maroon, named for the arcade we call home. Taped seams, side vents and a collar that stands the way a collar should.' },
-  { id:'QF-07', title:'Souk Stripe Tee', sub:'Yarn-dyed heritage stripes', cat:'Tees',
-    fabric:'Yarn-dyed cotton jersey · 210 GSM', care:CARE, price:2250, compareAt:2850,
-    colorway:{name:'Olive Grove', hex:'#6B7256'}, img:'1523381210434-271e8be1f52b',
-    isNew:false, featured:false, sizes:{S:9,M:11,L:8,XL:0,XXL:4}, chart:DEFAULT_CHART,
-    desc:'Yarn-dyed stripes in warm spice tones — the colour is woven in, not printed on, so it will never crack or fade. A quiet nod to the trading routes.' },
-  { id:'QF-08', title:'Unit-8 Oxford Shirt', sub:'Weekend casual button-down', cat:'Shirts',
-    fabric:'Brushed cotton oxford · 180 GSM', care:CARE, price:3950, compareAt:0,
-    colorway:{name:'White', hex:'#F4EFE6'}, img:'1602810318383-e386cc2a3ccf',
-    isNew:false, featured:true, sizes:{S:5,M:7,L:6,XL:4,XXL:2}, chart:DEFAULT_CHART,
-    desc:'A brushed oxford button-down with a soft, broken-in hand. Wear it open over a tee or buttoned to the top — it earns its place either way.' },
-  { id:'QF-09', title:'Desert Dye Tee', sub:'Garment-dyed · sun-faded', cat:'Tees',
-    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2150, compareAt:0,
-    colorway:{name:'Terracotta', hex:'#B4664A'}, img:'1622445275576-721325763afe',
-    isNew:false, featured:false, sizes:{S:8,M:12,L:9,XL:6,XXL:4}, chart:DEFAULT_CHART,
-    desc:'Garment-dyed in small batches for a sun-faded terracotta that no two pieces share exactly. Cut in our classic block with a reinforced shoulder seam.' },
-  { id:'QF-10', title:'Ravi Henley', sub:'Three-button waffle henley', cat:'Henleys',
-    fabric:'Waffle-knit cotton · 230 GSM', care:CARE, price:2650, compareAt:0,
-    colorway:{name:'Olive', hex:'#7A7561'}, img:'1618354691373-d851c5c3a990',
-    isNew:false, featured:false, sizes:{S:6,M:8,L:7,XL:5,XXL:3}, chart:DEFAULT_CHART,
-    desc:'A three-button henley in textured waffle knit — warm enough to layer, breathable enough to wear alone through a Hyderabad afternoon.' },
-  { id:'QF-11', title:'Saddar Weekend Shirt', sub:'Brushed twill overshirt', cat:'Shirts',
-    fabric:'Brushed cotton twill · 260 GSM', care:CARE, price:3650, compareAt:4250,
-    colorway:{name:'Stone', hex:'#B8AE9E'}, img:'1596755094514-f87e34085b2c',
-    isNew:false, featured:false, sizes:{S:4,M:6,L:5,XL:3,XXL:2}, chart:DEFAULT_CHART,
-    desc:'Part shirt, part light jacket. A brushed twill overshirt with chest pockets and corozo buttons — throw it over any tee in the collection.' },
-  { id:'QF-12', title:'Caravanserai Tee', sub:'Relaxed longline fit', cat:'Oversized',
-    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2550, compareAt:0,
-    colorway:{name:'Dust Rose', hex:'#C9A99A'}, img:'1622470953794-aa9c70b0fb9d',
-    isNew:true, featured:false, sizes:{S:7,M:9,L:8,XL:5,XXL:3}, chart:DEFAULT_CHART,
-    desc:'A relaxed longline tee in the dusty rose of our house pattern. Slightly dropped shoulders, a curved hem and a weight that drapes rather than clings.' },
-  { id:'QF-13', title:'Thar Graphic Tee', sub:'Desert-line chest print', cat:'Tees',
-    fabric:'100% combed cotton · 220 GSM', care:CARE, price:2350, compareAt:0,
-    colorway:{name:'Charcoal', hex:'#3A3532'}, img:'1527719327859-c6ce80353573',
-    isNew:false, featured:true, sizes:{S:8,M:10,L:8,XL:6,XXL:0}, chart:DEFAULT_CHART,
-    desc:'A single continuous line traces a dune horizon across the chest — screen-printed by hand in water-based inks on a deep charcoal base.' },
-  { id:'QF-14', title:'Qafilah Signature Tee', sub:'Embroidered قافلة chest mark', cat:'Tees',
-    fabric:'100% Supima-blend cotton · 230 GSM', care:CARE, price:2950, compareAt:0,
-    colorway:{name:'Cream', hex:'#F0E9DC'}, img:'1620799139507-2a76f79a2f4d',
-    isNew:true, featured:true, sizes:{S:6,M:9,L:7,XL:5,XXL:3}, chart:DEFAULT_CHART,
-    desc:'The flagship. A Supima-blend jersey with our قافلة wordmark embroidered — not printed — over the heart. The tee every Qafla man should own first.' },
-];
+const K = {
+  cart: 'qafla_cart_v3',
+  wish: 'qafla_wish_v3',
+  admin: 'qafla_admin_v3',
+  lock: 'qafla_admin_lock_v1',
+  pass: 'qafla_admin_pass_v1',
+  session: 'qafla_session_v1',
+  customers: 'qafla_customers_v1',
+};
 
-const REVIEWS = [
-  { stars:5, text:'“Bought the Shaheen polo last month — the fabric still looks brand new after a dozen washes. Best menswear in Latifabad, easily.”', who:'Ahmed R.', where:'Latifabad, Hyderabad', init:'AR' },
-  { stars:5, text:'“Ordered three tees on WhatsApp, delivered next day. The Qafilah signature tee is worth every rupee — the embroidery is proper work.”', who:'Bilal S.', where:'Saddar, Hyderabad', init:'BS' },
-  { stars:5, text:'“Finally a local brand with real quality. The oversized fit is exactly right and the colours are even better in person.”', who:'Hamza K.', where:'Qasimabad, Hyderabad', init:'HK' },
-];
-
-const K = { products:'qafla_products_v3', cart:'qafla_cart_v3', wish:'qafla_wish_v3', orders:'qafla_orders_v3', admin:'qafla_admin_v3', subs:'qafla_subs_v1', lock:'qafla_admin_lock_v1', pass:'qafla_admin_pass_v1', customers:'qafla_customers_v1', session:'qafla_session_v1' };
 const store = {
   get(k, f){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : f; } catch(e){ return f; } },
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} },
 };
 
 const state = {
-  products: store.get(K.products, null) || SEED_PRODUCTS.map(p => ({...p, imgs:[p.img, ...LIFE.slice(0,2)], chart:p.chart.map(r=>({...r})), sizes:{...p.sizes}})),
+  products: [],
   cart: store.get(K.cart, []),
   wish: store.get(K.wish, []),
-  orders: store.get(K.orders, []),
-  subs: store.get(K.subs, []),
+  orders: [],
+  subs: [],
   filters: { q:'', cat:'All', size:'All', sort:'featured' },
-  modal: null,           // {type:'product'|'chart'|'checkout'|'success', ...}
+  modal: null,
   pm: { size:null, qty:1, img:0 },
   admin: { authed: store.get(K.admin, false), tab:'products', editing:null, ...store.get(K.lock, { attempts:0, lockUntil:0 }), reset:{ step:null, otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false } },
   auth: { session: store.get(K.session, null), view:'signin', err:'', showPass:false },
   checkout: { method:'cod' },
 };
-if (!store.get(K.products, null)) persistProducts();
 
-function persistProducts(){ store.set(K.products, state.products); }
-function persistCart(){ store.set(K.cart, state.cart); updateCartCount(); }
-function persistWish(){ store.set(K.wish, state.wish); }
-function persistOrders(){ store.set(K.orders, state.orders); }
-function persistSubs(){ store.set(K.subs, state.subs); }
-function persistLoginLock(){ store.set(K.lock, { attempts: state.admin.attempts, lockUntil: state.admin.lockUntil }); }
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOGIN_LOCK_MS = 90 * 1000; // 1 minute 30 seconds
+// ===== SUPABASE DATA FUNCTIONS =====
 
-// Customer accounts — stored in this browser only, same as the rest of this demo storefront.
-// Move behind a real auth backend (with hashed passwords) before going live.
-function getCustomers(){ return store.get(K.customers, []); }
-function saveCustomers(list){ store.set(K.customers, list); }
-function findCustomer(email){ return getCustomers().find(c => c.email.toLowerCase() === String(email).toLowerCase()); }
-function persistSession(){ store.set(K.session, state.auth.session); }
+async function loadProducts(){
+  const { data, error } = await supabase.from('products').select('*').order('id');
+  if (error){ console.error('loadProducts error:', error); toast('Could not load products — check connection'); return; }
+  state.products = data.map(p => ({
+    id: p.id,
+    title: p.title,
+    sub: p.sub,
+    desc: p.description,
+    cat: p.category,
+    fabric: p.fabric,
+    care: p.care,
+    price: p.price,
+    compareAt: p.compare_at_price || 0,
+    colorway: { name: p.color_name, hex: p.color_hex },
+    img: p.images && p.images.length ? p.images[0] : '',
+    imgs: p.images || [],
+    isNew: p.is_new,
+    featured: p.featured,
+    sizes: p.sizes || {},
+    chart: p.size_chart || DEFAULT_CHART,
+  }));
+}
+
+async function loadOrders(){
+  const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+  if (error){ console.error('loadOrders error:', error); return; }
+  state.orders = data.map(o => ({
+    id: o.id,
+    date: new Date(o.created_at).toLocaleString('en-PK', { dateStyle:'medium', timeStyle:'short' }),
+    customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, city: o.customer_city, notes: o.customer_notes || '' },
+    items: o.items,
+    total: o.total,
+    payment: { method: o.payment_method, label: o.payment_label, ref: o.payment_ref || '', status: o.payment_status },
+  }));
+}
+
+async function loadSubs(){
+  const { data, error } = await supabase.from('subscribers').select('*').order('created_at', { ascending: false });
+  if (error){ console.error('loadSubs error:', error); return; }
+  state.subs = data.map(s => ({
+    phone: s.phone,
+    date: new Date(s.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
+  }));
+}
+
+async function saveProductToSupabase(product){
+  const payload = {
+    id: product.id,
+    title: product.title,
+    sub: product.sub,
+    description: product.desc,
+    category: product.cat,
+    fabric: product.fabric,
+    care: product.care,
+    price: product.price,
+    compare_at_price: product.compareAt || 0,
+    color_name: product.colorway.name,
+    color_hex: product.colorway.hex,
+    images: product.imgs,
+    is_new: product.isNew,
+    featured: product.featured,
+    sizes: product.sizes,
+    size_chart: product.chart,
+  };
+  const { error } = await supabase.from('products').upsert(payload);
+  if (error){ console.error('saveProduct error:', error); toast('Save failed — check connection'); return false; }
+  return true;
+}
+
+async function deleteProductFromSupabase(id){
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error){ console.error('deleteProduct error:', error); toast('Delete failed'); return false; }
+  return true;
+}
+
+async function saveOrderToSupabase(order){
+  const { error } = await supabase.from('orders').insert({
+    id: order.id,
+    customer_name: order.customer.name,
+    customer_phone: order.customer.phone,
+    customer_address: order.customer.address,
+    customer_city: order.customer.city,
+    customer_notes: order.customer.notes,
+    total: order.total,
+    payment_method: order.payment.method,
+    payment_label: order.payment.label,
+    payment_ref: order.payment.ref,
+    payment_status: order.payment.status,
+    items: order.items,
+  });
+  if (error){ console.error('saveOrder error:', error); return false; }
+  return true;
+}
+
+async function saveSubscriberToSupabase(phone){
+  const { error } = await supabase.from('subscribers').insert({ phone });
+  if (error && error.code !== '23505'){ console.error('saveSubscriber error:', error); return false; }
+  return true;
+}
+
+// ===== HELPERS =====
 
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -169,17 +187,22 @@ function addToCart(id, size, qty){
   const cc = $('#cart-count'); cc.classList.add('pop'); setTimeout(() => cc.classList.remove('pop'), 220);
   toast(p.title + ' · ' + size + ' added to bag');
 }
+
 function toggleWish(id, btn){
   const i = state.wish.indexOf(id);
   if (i > -1) { state.wish.splice(i,1); btn && btn.classList.remove('on'); toast('Removed from wishlist'); }
   else { state.wish.push(id); btn && btn.classList.add('on'); toast('Saved to wishlist'); }
   persistWish();
 }
+
 function updateCartCount(){
   const n = cartCount();
   $('#cart-count').textContent = n;
   $('#drawer-count').textContent = n ? '· ' + n + ' item' + (n>1?'s':'') : '';
 }
+
+function persistCart(){ store.set(K.cart, state.cart); updateCartCount(); }
+function persistWish(){ store.set(K.wish, state.wish); }
 
 function cardHTML(p, delay = 0){
   const imgs = prodImgs(p);
@@ -385,6 +408,12 @@ function renderShop(){
     </div>
   </section>`;
 }
+
+const REVIEWS = [
+  { stars:5, text:'"Bought the Shaheen polo last month — the fabric still looks brand new after a dozen washes. Best menswear in Latifabad, easily."', who:'Ahmed R.', where:'Latifabad, Hyderabad', init:'AR' },
+  { stars:5, text:'"Ordered three tees on WhatsApp, delivered next day. The Qafilah signature tee is worth every rupee — the embroidery is proper work."', who:'Bilal S.', where:'Saddar, Hyderabad', init:'BS' },
+  { stars:5, text:'"Finally a local brand with real quality. The oversized fit is exactly right and the colours are even better in person."', who:'Hamza K.', where:'Qasimabad, Hyderabad', init:'HK' },
+];
 
 const BLOG_POSTS = [
   { tag:'STYLE NOTES', title:'How to build a five-tee rotation that actually works', date:'12 Jul 2026',
@@ -947,7 +976,7 @@ function renderCheckoutModal(){
     <form data-action="place-order">
       <div class="co-grid">
         <div class="field"><label>Full name *</label><input name="name" required placeholder="e.g. Ali Raza" /></div>
-        <div class="field"><label>Phone *</label><input name="phone" required placeholder="03XX XXXXXXX" pattern="[0-9+\\-\\s]{10,15}" /></div>
+        <div class="field"><label>Phone *</label><input name="phone" required placeholder="03XX XXXXXXX" pattern="[0-9+\-\s]{10,15}" /></div>
         <div class="field field--full"><label>Delivery address *</label><textarea name="address" required placeholder="House, street, area"></textarea></div>
         <div class="field"><label>City *</label><input name="city" required placeholder="Hyderabad" value="Hyderabad" /></div>
         <div class="field"><label>Order notes</label><input name="notes" placeholder="Optional" /></div>
@@ -975,7 +1004,8 @@ function openCheckout(){
   openModal(renderCheckoutModal(), true);
 }
 
-function placeOrder(fd){
+async function placeOrder(fd){
+  console.log('=== PLACE ORDER STARTED ===');
   const method = fd.get('payment') || 'cod';
   const payLabel = (PAY_METHODS.find(m => m.id === method) || {}).label || 'Cash on delivery';
   const order = {
@@ -986,10 +1016,41 @@ function placeOrder(fd){
     total: cartTotal(),
     payment: { method, label: payLabel, ref: fd.get('paymentRef') || '', status: method === 'cod' ? 'Pay on delivery' : 'Pending verification' },
   };
+
+  console.log('Order object:', order);
+
+  // Update stock locally first
   order.items.forEach(it => { const p = findProduct(it.id); if (p) p.sizes[it.size] = Math.max(0, Number(p.sizes[it.size]) - it.qty); });
+
+  // Save to Supabase
+  console.log('Saving to Supabase...');
+  try {
+    const saved = await saveOrderToSupabase(order);
+    console.log('Supabase save result:', saved);
+    if (saved) {
+      console.log('Order saved to Supabase, updating stock...');
+      // Also update product stock in Supabase
+      for (const it of order.items) {
+        const p = findProduct(it.id);
+        if (p) {
+          const { error } = await supabase.from('products').update({ sizes: p.sizes }).eq('id', p.id);
+          if (error) console.error('Stock update error for', p.id, error);
+        }
+      }
+      console.log('Stock updated');
+    } else {
+      console.error('Failed to save order to Supabase');
+      toast('Order saved locally but cloud sync failed');
+    }
+  } catch (err) {
+    console.error('Supabase error:', err);
+    toast('Cloud save failed — order saved locally');
+  }
+
   state.orders.unshift(order);
   state.cart = [];
-  persistProducts(); persistOrders(); persistCart(); renderDrawer();
+  persistCart(); renderDrawer();
+
   const payCopy = method === 'cod'
     ? `We'll call <b>${esc(order.customer.phone)}</b> shortly to confirm, then dispatch. Pay in cash when it arrives.`
     : `We're verifying your ${esc(payLabel)} payment (ref: <b>${esc(order.payment.ref)}</b>) — you'll get a confirmation call on <b>${esc(order.customer.phone)}</b> shortly.`;
@@ -1015,11 +1076,12 @@ function placeOrder(fd){
     <button class="btn ${method !== 'cod' ? 'btn--ghost-dark' : 'btn--solid'} wfull" data-action="close-modal">Continue shopping</button>
   </div>`, true);
   state.modal = { type:'success' };
-  renderRoute(false); // refresh stock counts behind the modal
+  renderRoute(false);
   if (method !== 'cod'){
     const w = window.open(ownerWaUrl, '_blank', 'noopener');
-    if (!w) { /* popup blocked — the button in the modal above still covers this */ }
+    if (!w) { /* popup blocked */ }
   }
+  console.log('=== PLACE ORDER COMPLETE ===');
 }
 
 let ADMIN_PASS = store.get(K.pass, 'Pakistan110');
@@ -1072,7 +1134,7 @@ function renderAdmin(){
         <button class="atab" data-action="admin-logout">Log out</button>
       </div>
     </div>
-    <div class="admin-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Catalogue, orders and subscribers are saved to this browser. For syncing across devices or staff logins, connect this panel to a real backend.</div>
+    <div class="admin-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Catalogue, orders and subscribers are now synced to Supabase cloud. For staff logins, connect this panel to Supabase Auth.</div>
     ${tab === 'products' ? adminProducts() : tab === 'orders' ? adminOrders() : tab === 'subs' ? adminSubs() : adminForm()}
   </div></section>`;
 }
@@ -1329,8 +1391,6 @@ function refreshImgThumbsUI(){
     </div>`).join('');
 }
 
-// Resizes + compresses an uploaded photo client-side (max 1200px edge, JPEG q.82)
-// so a phone gallery photo (often 3-8MB) doesn't blow past localStorage limits.
 function compressImageFile(file){
   return new Promise((resolve, reject) => {
     if (!file.type || !file.type.startsWith('image/')){ reject(new Error('Not an image')); return; }
@@ -1375,7 +1435,7 @@ async function handleImgFileUpload(files){
   refreshImgThumbsUI();
 }
 
-function saveProduct(f){
+async function saveProduct(f){
   const fd = new FormData(f);
   const price = parseInt(String(fd.get('price')).replace(/[^\d]/g,''), 10);
   const compareAt = parseInt(String(fd.get('compareAt')).replace(/[^\d]/g,''), 10) || 0;
@@ -1405,8 +1465,12 @@ function saveProduct(f){
     isNew: !!fd.get('isNew'), featured: !!fd.get('featured'),
     sizes, chart: chart.length ? chart : DEFAULT_CHART.map(r => ({...r})),
   };
+
+  // Save to Supabase
+  const saved = await saveProductToSupabase(prod);
+  if (!saved) return;
+
   if (old) Object.assign(old, prod); else state.products.unshift(prod);
-  persistProducts();
   state.admin.tab = 'products'; state.admin.editing = null;
   toast(old ? 'Product updated' : 'Product added to the shop');
   renderRoute(false);
@@ -1508,6 +1572,8 @@ function refreshShopResults(){
   initReveals();
 }
 
+// ===== EVENT LISTENERS =====
+
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-action]');
   if (!t) return;
@@ -1546,25 +1612,29 @@ document.addEventListener('click', e => {
   else if (a === 'admin-del'){
     const p = findProduct(id);
     if (confirm('Delete "' + (p ? p.title : id) + '" from the shop?')){
-      state.products = state.products.filter(x => x.id !== id);
-      persistProducts(); toast('Product deleted'); renderRoute(false);
+      deleteProductFromSupabase(id).then(ok => {
+        if (ok) {
+          state.products = state.products.filter(x => x.id !== id);
+          toast('Product deleted'); renderRoute(false);
+        }
+      });
     }
   }
   else if (a === 'admin-cancel'){ state.admin.tab = 'products'; state.admin.editing = null; renderRoute(false); }
   else if (a === 'admin-reset'){
     if (confirm('Restore the original 14-product demo catalogue? Your added products will be replaced.')){
-      state.products = SEED_PRODUCTS.map(p => ({...p, imgs:[p.img, ...LIFE.slice(0,2)], chart:p.chart.map(r => ({...r})), sizes:{...p.sizes}}));
-      persistProducts(); toast('Demo catalogue restored'); renderRoute(false);
+      // This would need to re-seed from Supabase or a backup
+      toast('Demo restore — re-seed from Supabase SQL');
     }
   }
   else if (a === 'admin-logout'){ state.admin.authed = false; store.set(K.admin, false); renderRoute(false); }
   else if (a === 'reset-forgot'){ state.admin.reset = { step:'confirm', otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false }; renderRoute(false); }
   else if (a === 'reset-cancel'){ state.admin.reset = { step:null, otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false }; renderRoute(false); }
   else if (a === 'orders-clear'){
-    if (confirm('Clear all saved orders?')){ state.orders = []; persistOrders(); renderRoute(false); }
+    if (confirm('Clear all saved orders?')){ state.orders = []; renderRoute(false); }
   }
   else if (a === 'subs-clear'){
-    if (confirm('Clear all saved WhatsApp subscribers?')){ state.subs = []; persistSubs(); renderRoute(false); }
+    if (confirm('Clear all saved WhatsApp subscribers?')){ state.subs = []; renderRoute(false); }
   }
   else if (a === 'subs-copy'){
     const list = state.subs.map(s => s.phone).join('\n');
@@ -1631,7 +1701,7 @@ document.addEventListener('click', e => {
   }
 });
 
-document.addEventListener('submit', e => {
+document.addEventListener('submit', async e => {
   const f = e.target.closest('form[data-action]'); if (!f) return;
   e.preventDefault();
   const a = f.dataset.action;
@@ -1661,14 +1731,19 @@ document.addEventListener('submit', e => {
   else if (a === 'join-whatsapp'){
     const phone = f.querySelector('[name=phone]').value.trim();
     if (!phone) return;
-    state.subs.unshift({ phone, date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) });
-    persistSubs();
+
+    // Save to Supabase
+    const saved = await saveSubscriberToSupabase(phone);
+    if (saved || (await supabase.from('subscribers').select('phone').eq('phone', phone).single()).data) {
+      state.subs.unshift({ phone, date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) });
+    }
+
     f.reset();
     if (WHATSAPP_GROUP_LINK){
       toast('Saved! Opening WhatsApp…');
       window.open(WHATSAPP_GROUP_LINK, '_blank', 'noopener');
     } else {
-      toast('Got your number — we\'ll add you as soon as the group link is live');
+      toast('Got your number — we'll add you as soon as the group link is live');
     }
   }
   else if (a === 'admin-login'){
@@ -1775,7 +1850,27 @@ window.addEventListener('scroll', () => {
   if (hi) hi.style.transform = 'translateY(' + Math.min(y * .18, 120) + 'px)';
 }, { passive: true });
 
-renderRoute();
-updateCartCount();
-updateAccountUI();
-renderDrawer();
+// ===== CUSTOMER ACCOUNT FUNCTIONS =====
+
+function getCustomers(){ return store.get(K.customers, []); }
+function saveCustomers(list){ store.set(K.customers, list); }
+function findCustomer(email){ return getCustomers().find(c => c.email.toLowerCase() === String(email).toLowerCase()); }
+function persistSession(){ store.set(K.session, state.auth.session); }
+function persistLoginLock(){ store.set(K.lock, { attempts: state.admin.attempts, lockUntil: state.admin.lockUntil }); }
+
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOGIN_LOCK_MS = 90 * 1000;
+
+// ===== INITIALIZATION =====
+
+async function init(){
+  await loadProducts();
+  await loadOrders();
+  await loadSubs();
+  renderRoute();
+  updateCartCount();
+  updateAccountUI();
+  renderDrawer();
+}
+
+init();
