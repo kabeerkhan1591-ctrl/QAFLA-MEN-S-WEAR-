@@ -1,11 +1,20 @@
 'use strict';
 
 // ===== SUPABASE CONFIG =====
-// REPLACE THESE WITH YOUR ACTUAL KEYS FROM SUPABASE DASHBOARD
 const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// Only create client once
+let supabase;
+try {
+  if (typeof window.supabase !== 'undefined') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } else {
+    console.error('Supabase SDK not loaded');
+  }
+} catch(e) {
+  console.error('Supabase init failed:', e);
+}
 
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
 const FACEBOOK_APP_ID  = '1234567890';
