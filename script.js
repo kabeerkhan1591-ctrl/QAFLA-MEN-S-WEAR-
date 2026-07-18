@@ -1746,7 +1746,7 @@ document.addEventListener('submit', async e => {
       toast('Saved! Opening WhatsApp...');
       window.open(WHATSAPP_GROUP_LINK, '_blank', 'noopener');
     } else {
-      toast('Got your number -- we'll add you as soon as the group link is live');
+      toast("Got your number -- we'll add you as soon as the group link is live");
     }
   }
   else if (a === 'admin-login'){
