@@ -1,6 +1,9 @@
 'use strict';
+
+// ===== SUPABASE CONFIG =====
+// REPLACE THESE WITH YOUR ACTUAL KEYS FROM SUPABASE DASHBOARD
 const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -58,7 +61,7 @@ const state = {
 
 async function loadProducts(){
   const { data, error } = await supabase.from('products').select('*').order('id');
-  if (error){ console.error('loadProducts error:', error); toast('Could not load products — check connection'); return; }
+  if (error){ console.error('loadProducts error:', error); toast('Could not load products -- check connection'); return; }
   state.products = data.map(p => ({
     id: p.id,
     title: p.title,
@@ -121,7 +124,7 @@ async function saveProductToSupabase(product){
     size_chart: product.chart,
   };
   const { error } = await supabase.from('products').upsert(payload);
-  if (error){ console.error('saveProduct error:', error); toast('Save failed — check connection'); return false; }
+  if (error){ console.error('saveProduct error:', error); toast('Save failed -- check connection'); return false; }
   return true;
 }
 
@@ -260,7 +263,7 @@ function renderHome(){
     <div class="hero-inner">
       <div class="hero-eyebrow rv">QAFLA MEN'S WEAR · HYDERABAD, SINDH</div>
       <h1 class="rv rv-d1">Dress for the <em>journey</em>, not the destination.</h1>
-      <p class="rv rv-d2">Premium tees, polos and casual shirts — cut from honest cotton, finished by hand, and priced fairly in rupees. قافلة means caravan: we dress the men who keep moving.</p>
+      <p class="rv rv-d2">Premium tees, polos and casual shirts -- cut from honest cotton, finished by hand, and priced fairly in rupees. قافلة means caravan: we dress the men who keep moving.</p>
       <div class="hero-cta rv rv-d3">
         <a class="btn btn--solid" href="#/shop">Shop the collection</a>
         <a class="btn btn--ghost" href="#/#visit">Visit the store</a>
@@ -269,7 +272,7 @@ function renderHome(){
     <div class="hero-meta">
       <span><b>SHOP 02</b> · SHAHEEN ARCADE</span>
       <span><b>+92 315 3755007</b> · CALL OR WHATSAPP</span>
-      <span>OPEN DAILY · 11 AM – 10 PM</span>
+      <span>OPEN DAILY · 11 AM - 10 PM</span>
     </div>
   </section>
 
@@ -277,7 +280,7 @@ function renderHome(){
 
   <section class="section">
     <div class="wrap">
-      ${secHead('WAYPOINT 01 · FRESH OFF THE CARAVAN', 'New <em>arrivals</em>', 'The latest pieces to reach the shop — restocked weekly, gone quickly.', {href:'#/shop', label:'Shop all'})}
+      ${secHead('WAYPOINT 01 · FRESH OFF THE CARAVAN', 'New <em>arrivals</em>', 'The latest pieces to reach the shop -- restocked weekly, gone quickly.', {href:'#/shop', label:'Shop all'})}
       <div class="grid">${news.map((p,i) => cardHTML(p, i)).join('')}</div>
     </div>
   </section>
@@ -315,11 +318,11 @@ function renderHome(){
           </div>
           <div class="visit-line">
             <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.9 2.2Z"/></svg>
-            <span><b>+92 315 3755007</b><br />Call or WhatsApp — the owner picks up himself</span>
+            <span><b>+92 315 3755007</b><br />Call or WhatsApp -- the owner picks up himself</span>
           </div>
           <div class="visit-line">
             <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <span><b>Open daily</b> · 11:00 AM – 10:00 PM</span>
+            <span><b>Open daily</b> · 11:00 AM - 10:00 PM</span>
           </div>
           <div class="visit-cta">
             <a class="btn btn--clay" href="https://www.google.com/maps/search/?api=1&query=Shaheen+Arcade+Latifabad+Unit+8+Hyderabad+Sindh" target="_blank" rel="noopener">Visit now</a>
@@ -327,7 +330,7 @@ function renderHome(){
           </div>
         </div>
         <div class="visit-photo rv rv-d2">
-          <img src="${IMG_STORE}" alt="Inside the Qafla store — rails of menswear" loading="lazy" />
+          <img src="${IMG_STORE}" alt="Inside the Qafla store -- rails of menswear" loading="lazy" />
           <span class="tag">SHOP 02 · SHAHEEN ARCADE</span>
         </div>
       </div>
@@ -338,7 +341,7 @@ function renderHome(){
     <div class="wrap">
       <div class="news rv">
         <h3>Join the caravan.</h3>
-        <p>Add your WhatsApp number and tap join — you'll be added to our group for first dibs on new arrivals and subscriber-only sale prices. No spam, promise.</p>
+        <p>Add your WhatsApp number and tap join -- you'll be added to our group for first dibs on new arrivals and subscriber-only sale prices. No spam, promise.</p>
         <form class="news-form" data-action="join-whatsapp">
           <input type="tel" name="phone" required placeholder="Your WhatsApp number" aria-label="WhatsApp number" />
           <button class="btn btn--solid" type="submit">
@@ -377,7 +380,7 @@ function renderShop(){
     <div class="wrap">
       <div class="wp">THE FULL MANIFEST</div>
       <h2 class="sec-title">The <em>collection</em></h2>
-      <p class="sec-sub">Every piece currently on the rail at Shaheen Arcade — ${state.products.length} styles and counting.</p>
+      <p class="sec-sub">Every piece currently on the rail at Shaheen Arcade -- ${state.products.length} styles and counting.</p>
     </div>
   </section>
   <section class="section" style="padding-top:0">
@@ -385,7 +388,7 @@ function renderShop(){
       <div class="toolbar">
         <label class="search-box">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          <input id="shop-search" type="search" placeholder="Search tees, polos, shirts…" value="${esc(f.q)}" />
+          <input id="shop-search" type="search" placeholder="Search tees, polos, shirts..." value="${esc(f.q)}" />
         </label>
         <div class="chips" id="cat-chips">
           ${cats.map(c => `<button class="chip ${f.cat === c ? 'on' : ''}" data-action="f-cat" data-v="${esc(c)}">${esc(c)}</button>`).join('')}
@@ -403,37 +406,37 @@ function renderShop(){
       <div class="result-note">${list.length} OF ${state.products.length} STYLES</div>
       <div id="shop-results">
       ${list.length ? `<div class="grid">${list.map((p,i) => cardHTML(p, i % 4)).join('')}</div>`
-        : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter — or call <b>+92 315 3755007</b> and we'll source it for you.</div>`}
+        : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter -- or call <b>+92 315 3755007</b> and we'll source it for you.</div>`}
       </div>
     </div>
   </section>`;
 }
 
 const REVIEWS = [
-  { stars:5, text:'"Bought the Shaheen polo last month — the fabric still looks brand new after a dozen washes. Best menswear in Latifabad, easily."', who:'Ahmed R.', where:'Latifabad, Hyderabad', init:'AR' },
-  { stars:5, text:'"Ordered three tees on WhatsApp, delivered next day. The Qafilah signature tee is worth every rupee — the embroidery is proper work."', who:'Bilal S.', where:'Saddar, Hyderabad', init:'BS' },
+  { stars:5, text:'"Bought the Shaheen polo last month -- the fabric still looks brand new after a dozen washes. Best menswear in Latifabad, easily."', who:'Ahmed R.', where:'Latifabad, Hyderabad', init:'AR' },
+  { stars:5, text:'"Ordered three tees on WhatsApp, delivered next day. The Qafilah signature tee is worth every rupee -- the embroidery is proper work."', who:'Bilal S.', where:'Saddar, Hyderabad', init:'BS' },
   { stars:5, text:'"Finally a local brand with real quality. The oversized fit is exactly right and the colours are even better in person."', who:'Hamza K.', where:'Qasimabad, Hyderabad', init:'HK' },
 ];
 
 const BLOG_POSTS = [
   { tag:'STYLE NOTES', title:'How to build a five-tee rotation that actually works', date:'12 Jul 2026',
-    body:'A good week starts with fewer decisions, not more. Here is how we would build a five-tee week from the Qafla rail — one heavyweight crew, one stripe, one oversized, one polo, one that surprises you.' },
+    body:'A good week starts with fewer decisions, not more. Here is how we would build a five-tee week from the Qafla rail -- one heavyweight crew, one stripe, one oversized, one polo, one that surprises you.' },
   { tag:'FROM THE SHOP', title:'Why we weigh our cotton in GSM, not adjectives', date:'02 Jul 2026',
-    body:'"Soft" and "premium" mean nothing on a label. Grams per square metre tell you exactly what you are paying for — and why a 220 GSM tee outlasts a 160 GSM one, wash after wash.' },
+    body:'"Soft" and "premium" mean nothing on a label. Grams per square metre tell you exactly what you are paying for -- and why a 220 GSM tee outlasts a 160 GSM one, wash after wash.' },
   { tag:'CARE GUIDE', title:'The three-minute wash routine that keeps colour true', date:'19 Jun 2026',
     body:'Cold water, inside out, low tumble. That is the whole secret. A short walkthrough of the habits that keep our garment-dyed pieces looking new for years, not months.' },
   { tag:'CARAVAN STORIES', title:'Why we named the shop after a caravan', date:'05 Jun 2026',
-    body:'قافلة — Qafla — means caravan: a group that moves together, trading and travelling. A short note on the name, the neighbourhood, and the philosophy behind Shop 02.' },
+    body:'قافلة -- Qafla -- means caravan: a group that moves together, trading and travelling. A short note on the name, the neighbourhood, and the philosophy behind Shop 02.' },
 ];
 
 const FAQS = [
-  { q:'Do you deliver outside Hyderabad?', a:'Yes — we ship across Pakistan with cash on delivery available nationwide. Orders placed in Hyderabad are usually delivered same-day or next-day; other cities typically take 2–5 working days.' },
-  { q:'What sizes do you stock?', a:'Most styles run S to XXL. Each product page shows live stock per size and a size chart with chest, length and sleeve measurements — tap "Size chart" on any product to check before you order.' },
+  { q:'Do you deliver outside Hyderabad?', a:'Yes -- we ship across Pakistan with cash on delivery available nationwide. Orders placed in Hyderabad are usually delivered same-day or next-day; other cities typically take 2-5 working days.' },
+  { q:'What sizes do you stock?', a:'Most styles run S to XXL. Each product page shows live stock per size and a size chart with chest, length and sleeve measurements -- tap "Size chart" on any product to check before you order.' },
   { q:'Can I pay online, or is it cash only?', a:'We accept Cash on Delivery, bank transfer, EasyPaisa and JazzCash. Bank and wallet details are shared at checkout once you place your order.' },
   { q:'What is your exchange policy?', a:'We offer size exchanges within 3 days of delivery, provided the item is unworn, unwashed and has its original tags attached. Call or WhatsApp us on +92 315 3755007 to arrange a swap.' },
   { q:'Are refunds available?', a:'We primarily offer exchanges rather than cash refunds. See our Refund Policy page for the full details on eligibility and how to start a request.' },
-  { q:'How do I know if a size will fit me?', a:'Every product includes a detailed size chart under "Size chart". If you are between sizes, call us on +92 315 3755007 — we know our fits well and are happy to advise before you order.' },
-  { q:'Can I visit and try things on in person?', a:'Of course — we would love to see you. The store is at Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, open daily 11:00 AM – 10:00 PM.' },
+  { q:'How do I know if a size will fit me?', a:'Every product includes a detailed size chart under "Size chart". If you are between sizes, call us on +92 315 3755007 -- we know our fits well and are happy to advise before you order.' },
+  { q:'Can I visit and try things on in person?', a:'Of course -- we would love to see you. The store is at Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, open daily 11:00 AM - 10:00 PM.' },
 ];
 
 function infoHead(wp, title, sub){
@@ -462,7 +465,7 @@ function renderInfoPage(slug){
 
   if (slug === 'faqs'){
     return `
-    ${infoHead('BEFORE YOU ASK', 'Frequently asked <em>questions</em>', 'Everything we get asked most — ordering, sizing, delivery and care.')}
+    ${infoHead('BEFORE YOU ASK', 'Frequently asked <em>questions</em>', 'Everything we get asked most -- ordering, sizing, delivery and care.')}
     <section class="section" style="padding-top:0"><div class="wrap info-wrap">
       <div class="faq-list">
         ${FAQS.map((f,i) => `
@@ -480,16 +483,16 @@ function renderInfoPage(slug){
 
   if (slug === 'about'){
     return `
-    ${infoHead('OUR STORY', 'About <em>Qafla</em>', "قافلة — the caravan that doesn't stop moving.")}
+    ${infoHead('OUR STORY', 'About <em>Qafla</em>', "قافلة -- the caravan that doesn't stop moving.")}
     <section class="section" style="padding-top:0"><div class="wrap info-wrap">
       <div class="prose">
         <p>Qafla Men's Wear opened its doors at Shaheen Arcade, Latifabad Unit No. 8, with a simple idea: menswear cut from honest cotton, priced fairly, and built to travel well through everyday life in Hyderabad.</p>
         <h3>Why "Qafla"</h3>
-        <p>قافلة means caravan — a group of traders who move together, carrying goods across long distances. We chose the name because that is exactly what good clothing should do: keep moving with you, wash after wash, season after season, without losing its shape or its colour.</p>
+        <p>قافلة means caravan -- a group of traders who move together, carrying goods across long distances. We chose the name because that is exactly what good clothing should do: keep moving with you, wash after wash, season after season, without losing its shape or its colour.</p>
         <h3>What we make</h3>
-        <p>Every tee, polo and shirt on our rail is chosen or made for weight, hand-feel and stitching — combed and carded cottons weighing between 180 and 260 GSM, taped seams, and colours that are woven or garment-dyed rather than simply printed on.</p>
+        <p>Every tee, polo and shirt on our rail is chosen or made for weight, hand-feel and stitching -- combed and carded cottons weighing between 180 and 260 GSM, taped seams, and colours that are woven or garment-dyed rather than simply printed on.</p>
         <h3>Visit us</h3>
-        <p>We are a real shop with a real address — Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, Sindh — open daily from 11:00 AM to 10:00 PM. The owner answers the phone himself.</p>
+        <p>We are a real shop with a real address -- Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, Sindh -- open daily from 11:00 AM to 10:00 PM. The owner answers the phone himself.</p>
       </div>
     </div></section>`;
   }
@@ -507,7 +510,7 @@ function renderInfoPage(slug){
           </div>
           <div class="contact-line">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-            <span><b>Open daily</b> · 11:00 AM – 10:00 PM</span>
+            <span><b>Open daily</b> · 11:00 AM - 10:00 PM</span>
           </div>
           <a class="btn btn--clay" href="https://www.google.com/maps/search/?api=1&query=Shaheen+Arcade+Latifabad+Unit+8+Hyderabad+Sindh" target="_blank" rel="noopener">Get directions</a>
         </div>
@@ -558,7 +561,7 @@ function renderInfoPage(slug){
       <div class="prose">
         <p>This policy explains what information Qafla Men's Wear collects when you shop with us, and how we use it.</p>
         <h3>What we collect</h3>
-        <p>When you place an order or join our WhatsApp list, we collect your name, phone number, delivery address, and the details of what you've ordered. We do not collect payment card information — Cash on Delivery, bank transfer, EasyPaisa and JazzCash payments are handled directly between you and the relevant service.</p>
+        <p>When you place an order or join our WhatsApp list, we collect your name, phone number, delivery address, and the details of what you've ordered. We do not collect payment card information -- Cash on Delivery, bank transfer, EasyPaisa and JazzCash payments are handled directly between you and the relevant service.</p>
         <h3>How we use it</h3>
         <ul>
           <li>To process, pack and deliver your order</li>
@@ -583,11 +586,11 @@ function renderInfoPage(slug){
         <h3>Delivery times</h3>
         <ul>
           <li><strong>Hyderabad city:</strong> same-day or next-day delivery on most orders</li>
-          <li><strong>Rest of Sindh:</strong> 1–3 working days</li>
-          <li><strong>Rest of Pakistan:</strong> 2–5 working days via our courier partners</li>
+          <li><strong>Rest of Sindh:</strong> 1-3 working days</li>
+          <li><strong>Rest of Pakistan:</strong> 2-5 working days via our courier partners</li>
         </ul>
         <h3>Delivery charges</h3>
-        <p>Delivery fees are calculated by location and shown at checkout before you confirm your order. We occasionally run free-delivery promotions — watch the top banner and our WhatsApp group for these.</p>
+        <p>Delivery fees are calculated by location and shown at checkout before you confirm your order. We occasionally run free-delivery promotions -- watch the top banner and our WhatsApp group for these.</p>
         <h3>Cash on Delivery</h3>
         <p>Cash on Delivery is available nationwide. Please have the exact amount ready for the courier where possible.</p>
         <h3>Tracking your order</h3>
@@ -624,7 +627,7 @@ function renderDrawer(){
   const body = $('#drawer-body'), foot = $('#drawer-foot');
   updateCartCount();
   if (!state.cart.length){
-    body.innerHTML = `<div class="drawer-empty"><span class="serif">Your bag is empty.</span>The caravan waits — go pick something.<br /><br /><a class="link-arrow" href="#/shop" data-action="close-cart-link">Browse the collection →</a></div>`;
+    body.innerHTML = `<div class="drawer-empty"><span class="serif">Your bag is empty.</span>The caravan waits -- go pick something.<br /><br /><a class="link-arrow" href="#/shop" data-action="close-cart-link">Browse the collection →</a></div>`;
     foot.innerHTML = '';
     return;
   }
@@ -726,7 +729,7 @@ function openAuthModal(){
 function refreshAuthModal(){ openModal(renderAuthModal(), true); }
 
 function completeSocialSignIn({ name, email, provider, avatar }){
-  if (!email){ toast('Could not read an email from ' + provider + ' — try email sign-in instead'); return; }
+  if (!email){ toast('Could not read an email from ' + provider + ' -- try email sign-in instead'); return; }
   let list = getCustomers();
   let cust = findCustomer(email);
   if (!cust){
@@ -752,18 +755,18 @@ function ensureGoogleSDK(cb){
   if (window.google && window.google.accounts && window.google.accounts.id) { cb(); return; }
   const s = document.createElement('script');
   s.src = 'https://accounts.google.com/gsi/client'; s.async = true; s.defer = true;
-  s.onload = cb; s.onerror = () => toast('Could not load Google sign-in — check your connection');
+  s.onload = cb; s.onerror = () => toast('Could not load Google sign-in -- check your connection');
   document.head.appendChild(s);
 }
 
 function googleSignIn(){
-  if (!GOOGLE_CLIENT_ID){ toast('Google sign-in needs a Client ID — add GOOGLE_CLIENT_ID in script.js'); return; }
+  if (!GOOGLE_CLIENT_ID){ toast('Google sign-in needs a Client ID -- add GOOGLE_CLIENT_ID in script.js'); return; }
   ensureGoogleSDK(() => {
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
       callback: resp => {
         const payload = decodeJwt(resp.credential);
-        if (!payload){ toast('Google sign-in failed — please try again'); return; }
+        if (!payload){ toast('Google sign-in failed -- please try again'); return; }
         completeSocialSignIn({ name: payload.name, email: payload.email, provider:'google', avatar: payload.picture });
       },
     });
@@ -779,12 +782,12 @@ function ensureFacebookSDK(cb){
   };
   const s = document.createElement('script');
   s.src = 'https://connect.facebook.net/en_US/sdk.js'; s.async = true; s.defer = true;
-  s.onerror = () => toast('Could not load Facebook sign-in — check your connection');
+  s.onerror = () => toast('Could not load Facebook sign-in -- check your connection');
   document.head.appendChild(s);
 }
 
 function facebookSignIn(){
-  if (!FACEBOOK_APP_ID){ toast('Facebook sign-in needs an App ID — add FACEBOOK_APP_ID in script.js'); return; }
+  if (!FACEBOOK_APP_ID){ toast('Facebook sign-in needs an App ID -- add FACEBOOK_APP_ID in script.js'); return; }
   ensureFacebookSDK(() => {
     window.FB.login(resp => {
       if (resp.authResponse){
@@ -805,7 +808,7 @@ function updateAccountUI(){
     const initials = s.name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
     btn.classList.add('has-session');
     btn.innerHTML = s.avatar ? `<img src="${esc(s.avatar)}" alt="" />` : `<span>${esc(initials)}</span>`;
-    btn.setAttribute('aria-label', 'Account — ' + s.name);
+    btn.setAttribute('aria-label', 'Account -- ' + s.name);
   } else {
     btn.classList.remove('has-session');
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.6-3.6 4.6-5.5 7.5-5.5s5.9 1.9 7.5 5.5"/></svg>`;
@@ -883,7 +886,7 @@ function openChart(id){
       <thead><tr><th>Size</th><th>Chest</th><th>Length</th><th>Sleeve</th></tr></thead>
       <tbody>${(p.chart || DEFAULT_CHART).map(r => `<tr><td><b>${esc(r.size)}</b></td><td>${esc(r.chest)}"</td><td>${esc(r.length)}"</td><td>${esc(r.sleeve)}"</td></tr>`).join('')}</tbody>
     </table>
-    <p class="chart-note">Still unsure? WhatsApp <b>+92 315 3755007</b> with your height and usual fit — we'll tell you exactly what to take.</p>
+    <p class="chart-note">Still unsure? WhatsApp <b>+92 315 3755007</b> with your height and usual fit -- we'll tell you exactly what to take.</p>
   </div>`, true);
 }
 
@@ -932,8 +935,8 @@ function payMethodPanel(method){
     const placeholder = BANK_DETAILS.account.startsWith('Add your');
     if (placeholder){
       return `<div class="pay-info">
-        <p>Bank transfer details aren't set up on the site yet — message us on WhatsApp and we'll send you the account details directly.</p>
-        <a class="btn btn--ghost-dark wfull" href="https://wa.me/923153755007?text=${encodeURIComponent('Hi, I want to pay by bank transfer for my order — please send account details.')}" target="_blank" rel="noopener">Ask on WhatsApp</a>
+        <p>Bank transfer details aren't set up on the site yet -- message us on WhatsApp and we'll send you the account details directly.</p>
+        <a class="btn btn--ghost-dark wfull" href="https://wa.me/923153755007?text=${encodeURIComponent('Hi, I want to pay by bank transfer for my order -- please send account details.')}" target="_blank" rel="noopener">Ask on WhatsApp</a>
         <div class="field" style="margin-top:1rem"><label>Bank reference (once you have it) *</label><input name="paymentRef" required placeholder="Transaction reference" /></div>
       </div>`;
     }
@@ -972,7 +975,7 @@ function renderCheckoutModal(){
   return `
   <div class="co">
     <h3>Checkout</h3>
-    <p class="co-sub">Choose how you'd like to pay — we'll confirm your order right after.</p>
+    <p class="co-sub">Choose how you'd like to pay -- we'll confirm your order right after.</p>
     <form data-action="place-order">
       <div class="co-grid">
         <div class="field"><label>Full name *</label><input name="name" required placeholder="e.g. Ali Raza" /></div>
@@ -1044,7 +1047,7 @@ async function placeOrder(fd){
     }
   } catch (err) {
     console.error('Supabase error:', err);
-    toast('Cloud save failed — order saved locally');
+    toast('Cloud save failed -- order saved locally');
   }
 
   state.orders.unshift(order);
@@ -1053,16 +1056,16 @@ async function placeOrder(fd){
 
   const payCopy = method === 'cod'
     ? `We'll call <b>${esc(order.customer.phone)}</b> shortly to confirm, then dispatch. Pay in cash when it arrives.`
-    : `We're verifying your ${esc(payLabel)} payment (ref: <b>${esc(order.payment.ref)}</b>) — you'll get a confirmation call on <b>${esc(order.customer.phone)}</b> shortly.`;
+    : `We're verifying your ${esc(payLabel)} payment (ref: <b>${esc(order.payment.ref)}</b>) -- you'll get a confirmation call on <b>${esc(order.customer.phone)}</b> shortly.`;
   const ownerMsgLines = [
     `New order ${order.id}`,
     `${order.customer.name} · ${order.customer.phone}`,
     `${order.customer.address}, ${order.customer.city}`,
     ``,
-    ...order.items.map(it => `${it.title} (${it.size}) x${it.qty} — ${fmt(it.price * it.qty)}`),
+    ...order.items.map(it => `${it.title} (${it.size}) x${it.qty} -- ${fmt(it.price * it.qty)}`),
     ``,
     `Total: ${fmt(order.total)}`,
-    `Payment: ${payLabel}${order.payment.ref ? ' — ref: ' + order.payment.ref : ''}`,
+    `Payment: ${payLabel}${order.payment.ref ? ' -- ref: ' + order.payment.ref : ''}`,
     order.customer.notes ? `Notes: ${order.customer.notes}` : '',
   ].filter(Boolean).join('\n');
   const ownerWaUrl = `https://wa.me/923153755007?text=${encodeURIComponent(ownerMsgLines)}`;
@@ -1256,7 +1259,7 @@ function adminProducts(){
         <td><div class="t">${esc(p.title)}</div><div class="c">${esc(p.cat)} · ${esc(p.colorway.name)}</div></td>
         <td class="c">${fmt(p.price)}${p.compareAt > p.price ? ` <s style="color:var(--ink-dim)">${fmt(p.compareAt)}</s>` : ''}</td>
         <td><span class="stock-pill ${t <= 8 ? 'low' : ''}">${t} pcs</span></td>
-        <td class="c">${[p.featured && 'FEATURED', p.isNew && 'NEW', p.compareAt > p.price && 'SALE'].filter(Boolean).join(' · ') || '—'}</td>
+        <td class="c">${[p.featured && 'FEATURED', p.isNew && 'NEW', p.compareAt > p.price && 'SALE'].filter(Boolean).join(' · ') || '--'}</td>
         <td><div class="row-actions">
           <button class="mini-btn" data-action="admin-edit" data-id="${esc(p.id)}">Edit</button>
           <button class="mini-btn danger" data-action="admin-del" data-id="${esc(p.id)}">Delete</button>
@@ -1275,7 +1278,7 @@ function adminOrders(){
     <div class="order-card">
       <div class="oh">
         <span class="oid">${esc(o.id)}</span>
-        <span class="pay-chip ${pay.status === 'Pending verification' ? 'pending' : ''}">${esc(pay.label)}${pay.ref ? ' · ' + esc(pay.ref) : ''} — ${esc(pay.status)}</span>
+        <span class="pay-chip ${pay.status === 'Pending verification' ? 'pending' : ''}">${esc(pay.label)}${pay.ref ? ' · ' + esc(pay.ref) : ''} -- ${esc(pay.status)}</span>
         <span class="od">${esc(o.date)}</span>
       </div>
       <div class="items">
@@ -1315,17 +1318,17 @@ function adminForm(){
   const chart = (p && p.chart && p.chart.length ? p.chart : DEFAULT_CHART).map(r => ({...r}));
   return `
   <form class="aform" data-action="admin-save">
-    <h3>${p ? 'Edit — ' + esc(p.title) : 'Add a new product'}</h3>
+    <h3>${p ? 'Edit -- ' + esc(p.title) : 'Add a new product'}</h3>
     <input type="hidden" name="pid" value="${p ? esc(p.id) : ''}" />
     <div class="fgrid">
       <div class="field"><label>Title *</label><input name="title" required value="${v(p && p.title)}" placeholder="e.g. Nomad Crew Tee" /></div>
       <div class="field"><label>Subtitle</label><input name="sub" value="${v(p && p.sub)}" placeholder="e.g. Heavyweight everyday crew" /></div>
-      <div class="field field--full"><label>Description *</label><textarea name="desc" required placeholder="Fabric, fit and feel — sell the story.">${v(p && p.desc)}</textarea></div>
+      <div class="field field--full"><label>Description *</label><textarea name="desc" required placeholder="Fabric, fit and feel -- sell the story.">${v(p && p.desc)}</textarea></div>
       <div class="field"><label>Category</label><select name="cat">${CATS.map(c => `<option ${p && p.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
       <div class="field"><label>Fabric</label><input name="fabric" value="${v(p && p.fabric)}" placeholder="100% combed cotton · 220 GSM" /></div>
       <div class="field field--full"><label>Care instructions</label><input name="care" value="${v(p && p.care) || CARE}" /></div>
       <div class="field"><label>Price (PKR) *</label><input name="price" required inputmode="numeric" value="${p ? p.price : ''}" placeholder="2450" /></div>
-      <div class="field"><label>Compare-at price (PKR) — 0 for none</label><input name="compareAt" inputmode="numeric" value="${p ? p.compareAt || 0 : 0}" /></div>
+      <div class="field"><label>Compare-at price (PKR) -- 0 for none</label><input name="compareAt" inputmode="numeric" value="${p ? p.compareAt || 0 : 0}" /></div>
       <div class="fsec"><h4>Colourway</h4>
         <div class="color-row">
           <div class="field" style="flex:1"><label>Colour name</label><input name="cname" value="${v(p && p.colorway.name)}" placeholder="e.g. Qafla Maroon" /></div>
@@ -1339,10 +1342,10 @@ function adminForm(){
             Upload from device
           </label>
           <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" />
-          <span class="img-upload-hint">Pick photos from your gallery or camera — or paste image URLs below, one per line</span>
+          <span class="img-upload-hint">Pick photos from your gallery or camera -- or paste image URLs below, one per line</span>
         </div>
-        <div class="field"><textarea name="images" id="images-textarea" required placeholder="1521572163474-6864f9cf17ab&#10;https://images.unsplash.com/photo-…">${v(imgs)}</textarea></div>
-        <div class="img-upload-busy" id="img-upload-busy" hidden>Processing image…</div>
+        <div class="field"><textarea name="images" id="images-textarea" required placeholder="1521572163474-6864f9cf17ab&#10;https://images.unsplash.com/photo-...">${v(imgs)}</textarea></div>
+        <div class="img-upload-busy" id="img-upload-busy" hidden>Processing image...</div>
         <div class="img-thumbs" id="img-thumbs"></div>
       </div>
       <div class="fsec"><h4>Stock per size</h4>
@@ -1424,7 +1427,7 @@ async function handleImgFileUpload(files){
   const added = [];
   for (const file of files){
     try { added.push(await compressImageFile(file)); }
-    catch(e){ toast(`Couldn't add ${file.name || 'that photo'} — try another`); }
+    catch(e){ toast(`Couldn't add ${file.name || 'that photo'} -- try another`); }
   }
   if (added.length){
     const existing = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
@@ -1563,7 +1566,7 @@ function refreshShopResults(){
   const list = filteredProducts();
   box.innerHTML = list.length
     ? `<div class="grid">${list.map((p,i) => cardHTML(p, i % 4)).join('')}</div>`
-    : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter — or call <b>+92 315 3755007</b> and we'll source it for you.</div>`;
+    : `<div class="empty"><span class="serif">The caravan hasn't brought that yet.</span>Try a different search or filter -- or call <b>+92 315 3755007</b> and we'll source it for you.</div>`;
   const note = $('.result-note'); if (note) note.textContent = `${list.length} OF ${state.products.length} STYLES`;
   $$('#cat-chips .chip, [data-action="f-size"]').forEach(ch => {
     const isCat = ch.dataset.action === 'f-cat';
@@ -1624,7 +1627,7 @@ document.addEventListener('click', e => {
   else if (a === 'admin-reset'){
     if (confirm('Restore the original 14-product demo catalogue? Your added products will be replaced.')){
       // This would need to re-seed from Supabase or a backup
-      toast('Demo restore — re-seed from Supabase SQL');
+      toast('Demo restore -- re-seed from Supabase SQL');
     }
   }
   else if (a === 'admin-logout'){ state.admin.authed = false; store.set(K.admin, false); renderRoute(false); }
@@ -1640,7 +1643,7 @@ document.addEventListener('click', e => {
     const list = state.subs.map(s => s.phone).join('\n');
     navigator.clipboard && navigator.clipboard.writeText(list).then(
       () => toast('Copied ' + state.subs.length + ' number(s)'),
-      () => toast('Could not copy — select the table manually')
+      () => toast('Could not copy -- select the table manually')
     );
   }
   else if (a === 'chart-add'){
@@ -1661,7 +1664,7 @@ document.addEventListener('click', e => {
     state.checkout.method = t.dataset.v;
     openModal(renderCheckoutModal(), true);
   }
-  else if (a === 'pay-soon'){ toast('Card payments are coming soon — try EasyPaisa, JazzCash or cash for now'); }
+  else if (a === 'pay-soon'){ toast('Card payments are coming soon -- try EasyPaisa, JazzCash or cash for now'); }
   else if (a === 'copy-pay-num'){
     const num = t.dataset.num;
     if (navigator.clipboard && navigator.clipboard.writeText){
@@ -1692,11 +1695,11 @@ document.addEventListener('click', e => {
     const r = state.admin.reset;
     if (r.otpSentAt && now < r.otpSentAt + OTP_RESEND_MS && r.step === 'otp'){ renderRoute(false); return; }
     const otp = String(Math.floor(100000 + Math.random() * 900000));
-    const msg = `Qafla Men's Wear — your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
+    const msg = `Qafla Men's Wear -- your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
     const waUrl = `https://wa.me/${RECOVERY_WA}?text=${encodeURIComponent(msg)}`;
     const win = window.open(waUrl, '_blank', 'noopener');
     state.admin.reset = { step:'otp', otp, otpSentAt: now, otpTries:0, err:'', showPass:false };
-    toast(win ? 'WhatsApp opened with your code — hit send' : 'Pop-up blocked — allow pop-ups, then resend');
+    toast(win ? 'WhatsApp opened with your code -- hit send' : 'Pop-up blocked -- allow pop-ups, then resend');
     renderRoute(false);
   }
 });
@@ -1720,13 +1723,13 @@ document.addEventListener('submit', async e => {
     const name = $('#auth-name').value.trim();
     const email = $('#auth-email').value.trim();
     const pass = $('#auth-pass').value, pass2 = $('#auth-pass2').value;
-    if (findCustomer(email)){ state.auth.err = 'An account with that email already exists — sign in instead.'; refreshAuthModal(); return; }
+    if (findCustomer(email)){ state.auth.err = 'An account with that email already exists -- sign in instead.'; refreshAuthModal(); return; }
     if (pass !== pass2){ state.auth.err = 'Passwords do not match.'; refreshAuthModal(); return; }
     if (pass.length < 4){ state.auth.err = 'Password must be at least 4 characters.'; refreshAuthModal(); return; }
     const cust = { id:'C-' + Date.now().toString(36), name, email, pass, provider:'email', avatar:'', joined: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) };
     const list = getCustomers(); list.unshift(cust); saveCustomers(list);
     state.auth.session = { name: cust.name, email: cust.email, provider:'email', avatar:'' };
-    persistSession(); toast('Account created — welcome, ' + name.split(' ')[0] + '!'); closeModal(); updateAccountUI();
+    persistSession(); toast('Account created -- welcome, ' + name.split(' ')[0] + '!'); closeModal(); updateAccountUI();
   }
   else if (a === 'join-whatsapp'){
     const phone = f.querySelector('[name=phone]').value.trim();
@@ -1740,10 +1743,10 @@ document.addEventListener('submit', async e => {
 
     f.reset();
     if (WHATSAPP_GROUP_LINK){
-      toast('Saved! Opening WhatsApp…');
+      toast('Saved! Opening WhatsApp...');
       window.open(WHATSAPP_GROUP_LINK, '_blank', 'noopener');
     } else {
-      toast('Got your number — we'll add you as soon as the group link is live');
+      toast('Got your number -- we'll add you as soon as the group link is live');
     }
   }
   else if (a === 'admin-login'){
@@ -1764,7 +1767,7 @@ document.addEventListener('submit', async e => {
       } else {
         persistLoginLock();
         const left = MAX_LOGIN_ATTEMPTS - state.admin.attempts;
-        $('#gate-err').textContent = `Wrong passcode — ${left} attempt${left === 1 ? '' : 's'} left before a 1:30 lockout.`;
+        $('#gate-err').textContent = `Wrong passcode -- ${left} attempt${left === 1 ? '' : 's'} left before a 1:30 lockout.`;
       }
     }
   }
@@ -1774,11 +1777,11 @@ document.addEventListener('submit', async e => {
     const r = state.admin.reset;
     if (r.otpSentAt && now < r.otpSentAt + OTP_RESEND_MS && r.step === 'otp'){ renderRoute(false); return; }
     const otp = String(Math.floor(100000 + Math.random() * 900000));
-    const msg = `Qafla Men's Wear — your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
+    const msg = `Qafla Men's Wear -- your owner's room recovery code is ${otp}. Do not share this code with anyone.`;
     const waUrl = `https://wa.me/${RECOVERY_WA}?text=${encodeURIComponent(msg)}`;
     const win = window.open(waUrl, '_blank', 'noopener');
     state.admin.reset = { step:'otp', otp, otpSentAt: now, otpTries:0, err:'', showPass:false };
-    toast(win ? 'WhatsApp opened with your code — hit send' : 'Pop-up blocked — allow pop-ups, then resend');
+    toast(win ? 'WhatsApp opened with your code -- hit send' : 'Pop-up blocked -- allow pop-ups, then resend');
     renderRoute(false);
   }
   else if (a === 'reset-verify-otp'){
@@ -1789,7 +1792,7 @@ document.addEventListener('submit', async e => {
       renderRoute(false);
     } else {
       r.otpTries = (r.otpTries || 0) + 1;
-      r.err = r.otpTries >= 5 ? 'Too many wrong codes — request a fresh one.' : 'That code doesn\'t match — double-check WhatsApp and try again.';
+      r.err = r.otpTries >= 5 ? 'Too many wrong codes -- request a fresh one.' : 'That code doesn\'t match -- double-check WhatsApp and try again.';
       renderRoute(false);
     }
   }
@@ -1804,7 +1807,7 @@ document.addEventListener('submit', async e => {
     ADMIN_PASS = p1;
     store.set(K.pass, ADMIN_PASS);
     state.admin.reset = { step:'done', otp:null, otpSentAt:0, otpTries:0, err:'', showPass:false };
-    toast('Passcode updated — log in with your new passcode');
+    toast('Passcode updated -- log in with your new passcode');
     renderRoute(false);
   }
 });
