@@ -7,15 +7,24 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
 const FACEBOOK_APP_ID  = '1234567890';
 
-// Create Supabase client safely (only once)
-const supabase = window.supabase ? 
-  window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : 
-  null;
+// Safe Supabase initialization (fixes duplicate declaration)
+let supabase = null;
 
-if (!supabase) {
-  console.error('Supabase SDK not loaded - check script order in index.html');
+function initSupabase() {
+  if (typeof window.supabase !== 'undefined') {
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log('%cSupabase initialized successfully', 'color: green; font-weight: bold');
+  } else {
+    console.error('Supabase SDK not loaded - make sure the CDN script is before script.js in index.html');
+  }
 }
 
+// Initialize when ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSupabase);
+} else {
+  initSupabase();
+}
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
 const IMG_STORE = IMG('1441986300917-64674bd600d8', 1200);
