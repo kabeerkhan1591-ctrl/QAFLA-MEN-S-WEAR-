@@ -1,4 +1,6 @@
 'use strict';
+const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';   // console.cloud.google.com/apis/credentials
 const FACEBOOK_APP_ID  = '1234567890';   // developers.facebook.com/apps
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
@@ -142,7 +144,8 @@ const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt = n => 'Rs. ' + Number(n || 0).toLocaleString('en-US');
-const prodImgs = p => (p.imgs && p.imgs.length ? p.imgs : [p.img]).map(id => id.startsWith('http') ? id : IMG(id));
+const prodImgs = p => (p.imgs && p.imgs.length ? p.imgs : [p.img]).map(id => isFullImgUrl(id) ? id : IMG(id));
+const isFullImgUrl = s => /^(https?:|data:)/i.test(String(s || ''));
 const totalStock = p => Object.values(p.sizes || {}).reduce((a,b) => a + Number(b || 0), 0);
 const inStockSizes = p => Object.entries(p.sizes || {}).filter(([,n]) => Number(n) > 0).map(([s]) => s);
 const cartCount = () => state.cart.reduce((a,i) => a + i.qty, 0);
@@ -381,6 +384,211 @@ function renderShop(){
       </div>
     </div>
   </section>`;
+}
+
+const BLOG_POSTS = [
+  { tag:'STYLE NOTES', title:'How to build a five-tee rotation that actually works', date:'12 Jul 2026',
+    body:'A good week starts with fewer decisions, not more. Here is how we would build a five-tee week from the Qafla rail — one heavyweight crew, one stripe, one oversized, one polo, one that surprises you.' },
+  { tag:'FROM THE SHOP', title:'Why we weigh our cotton in GSM, not adjectives', date:'02 Jul 2026',
+    body:'"Soft" and "premium" mean nothing on a label. Grams per square metre tell you exactly what you are paying for — and why a 220 GSM tee outlasts a 160 GSM one, wash after wash.' },
+  { tag:'CARE GUIDE', title:'The three-minute wash routine that keeps colour true', date:'19 Jun 2026',
+    body:'Cold water, inside out, low tumble. That is the whole secret. A short walkthrough of the habits that keep our garment-dyed pieces looking new for years, not months.' },
+  { tag:'CARAVAN STORIES', title:'Why we named the shop after a caravan', date:'05 Jun 2026',
+    body:'قافلة — Qafla — means caravan: a group that moves together, trading and travelling. A short note on the name, the neighbourhood, and the philosophy behind Shop 02.' },
+];
+
+const FAQS = [
+  { q:'Do you deliver outside Hyderabad?', a:'Yes — we ship across Pakistan with cash on delivery available nationwide. Orders placed in Hyderabad are usually delivered same-day or next-day; other cities typically take 2–5 working days.' },
+  { q:'What sizes do you stock?', a:'Most styles run S to XXL. Each product page shows live stock per size and a size chart with chest, length and sleeve measurements — tap "Size chart" on any product to check before you order.' },
+  { q:'Can I pay online, or is it cash only?', a:'We accept Cash on Delivery, bank transfer, EasyPaisa and JazzCash. Bank and wallet details are shared at checkout once you place your order.' },
+  { q:'What is your exchange policy?', a:'We offer size exchanges within 3 days of delivery, provided the item is unworn, unwashed and has its original tags attached. Call or WhatsApp us on +92 315 3755007 to arrange a swap.' },
+  { q:'Are refunds available?', a:'We primarily offer exchanges rather than cash refunds. See our Refund Policy page for the full details on eligibility and how to start a request.' },
+  { q:'How do I know if a size will fit me?', a:'Every product includes a detailed size chart under "Size chart". If you are between sizes, call us on +92 315 3755007 — we know our fits well and are happy to advise before you order.' },
+  { q:'Can I visit and try things on in person?', a:'Of course — we would love to see you. The store is at Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, open daily 11:00 AM – 10:00 PM.' },
+];
+
+function infoHead(wp, title, sub){
+  return `<section class="page-hero"><div class="wrap">
+    <div class="wp">${esc(wp)}</div>
+    <h2 class="sec-title">${title}</h2>
+    ${sub ? `<p class="sec-sub">${esc(sub)}</p>` : ''}
+  </div></section>`;
+}
+
+function renderInfoPage(slug){
+  if (slug === 'blog'){
+    return `
+    ${infoHead('THE JOURNAL', 'From the <em>shop</em>', 'Notes on fabric, fit and the caravan behind Qafla.')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap" style="max-width:1000px">
+      <div class="blog-grid">
+        ${BLOG_POSTS.map(p => `
+        <article class="blog-card">
+          <div class="wp">${esc(p.tag)} · ${esc(p.date)}</div>
+          <h3>${esc(p.title)}</h3>
+          <p>${esc(p.body)}</p>
+        </article>`).join('')}
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'faqs'){
+    return `
+    ${infoHead('BEFORE YOU ASK', 'Frequently asked <em>questions</em>', 'Everything we get asked most — ordering, sizing, delivery and care.')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <div class="faq-list">
+        ${FAQS.map((f,i) => `
+        <div class="faq-item${i===0?' open':''}">
+          <button class="faq-q" data-action="faq-toggle" type="button">
+            ${esc(f.q)}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <div class="faq-a"><p>${esc(f.a)}</p></div>
+        </div>`).join('')}
+      </div>
+      <p style="margin-top:1.8rem;font-size:.9rem;color:var(--ink-dim)">Still have a question? Call or WhatsApp <b>+92 315 3755007</b> and we'll help directly.</p>
+    </div></section>`;
+  }
+
+  if (slug === 'about'){
+    return `
+    ${infoHead('OUR STORY', 'About <em>Qafla</em>', "قافلة — the caravan that doesn't stop moving.")}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <div class="prose">
+        <p>Qafla Men's Wear opened its doors at Shaheen Arcade, Latifabad Unit No. 8, with a simple idea: menswear cut from honest cotton, priced fairly, and built to travel well through everyday life in Hyderabad.</p>
+        <h3>Why "Qafla"</h3>
+        <p>قافلة means caravan — a group of traders who move together, carrying goods across long distances. We chose the name because that is exactly what good clothing should do: keep moving with you, wash after wash, season after season, without losing its shape or its colour.</p>
+        <h3>What we make</h3>
+        <p>Every tee, polo and shirt on our rail is chosen or made for weight, hand-feel and stitching — combed and carded cottons weighing between 180 and 260 GSM, taped seams, and colours that are woven or garment-dyed rather than simply printed on.</p>
+        <h3>Visit us</h3>
+        <p>We are a real shop with a real address — Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad, Sindh — open daily from 11:00 AM to 10:00 PM. The owner answers the phone himself.</p>
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'contact'){
+    return `
+    ${infoHead('GET IN TOUCH', 'Contact <em>us</em>', "Questions about an order, a size, or just want to say salaam? We're a call away.")}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <div class="contact-grid">
+        <div class="contact-card">
+          <h4>Visit the store</h4>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span><b>Shop No. 02, Shaheen Arcade</b><br />Latifabad Unit No. 8, Hyderabad, Sindh, Pakistan</span>
+          </div>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <span><b>Open daily</b> · 11:00 AM – 10:00 PM</span>
+          </div>
+          <a class="btn btn--clay" href="https://www.google.com/maps/search/?api=1&query=Shaheen+Arcade+Latifabad+Unit+8+Hyderabad+Sindh" target="_blank" rel="noopener">Get directions</a>
+        </div>
+        <div class="contact-card">
+          <h4>Call or message</h4>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.7a2 2 0 0 1-.4 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.5 2.7.6a2 2 0 0 1 1.9 2.2Z"/></svg>
+            <span><b>+92 315 3755007</b><br />The owner picks up himself</span>
+          </div>
+          <div class="contact-line">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm5.4 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.9s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5s.8 1.9.8 2c.1.1.1.3 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1.1 2.2 1.4 2.5 1.5.3.1.5.1.7-.1l1-1.2c.2-.3.4-.2.7-.1l1.9.9c.3.1.5.2.5.3.1.2.1.7-.1 1.3Z"/></svg>
+            <span><b>WhatsApp us</b><br />Fastest way to reach us for orders and sizing</span>
+          </div>
+          <a class="btn btn--solid" href="https://wa.me/923153755007" target="_blank" rel="noopener">WhatsApp now</a>
+        </div>
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'refund-policy'){
+    return `
+    ${infoHead('POLICIES', 'Refund <em>policy</em>')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <span class="info-updated">Last updated · July 2026</span>
+      <div class="prose">
+        <p>We want every Qafla piece you own to fit and feel right. If something isn't working out, here's how returns and exchanges work.</p>
+        <h3>Exchanges</h3>
+        <p>We accept size exchanges within <strong>3 days of delivery</strong>, provided the item is unworn, unwashed, and returned with its original tags attached. Contact us on WhatsApp or call <strong>+92 315 3755007</strong> to arrange a pickup or drop-off at the store.</p>
+        <h3>Refunds</h3>
+        <p>Because most orders are paid via Cash on Delivery, we generally offer store credit or a size exchange rather than a cash refund. Refunds to bank, EasyPaisa or JazzCash accounts are considered case-by-case for items that arrive damaged or incorrect.</p>
+        <h3>Non-returnable items</h3>
+        <ul>
+          <li>Items marked as final sale at checkout</li>
+          <li>Worn, washed or altered garments</li>
+          <li>Items without their original tags</li>
+        </ul>
+        <h3>Damaged or incorrect items</h3>
+        <p>If your order arrives damaged or you receive the wrong item, contact us within 48 hours of delivery with a photo and your order details, and we'll sort it out at no extra cost to you.</p>
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'privacy-policy'){
+    return `
+    ${infoHead('POLICIES', 'Privacy <em>policy</em>')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <span class="info-updated">Last updated · July 2026</span>
+      <div class="prose">
+        <p>This policy explains what information Qafla Men's Wear collects when you shop with us, and how we use it.</p>
+        <h3>What we collect</h3>
+        <p>When you place an order or join our WhatsApp list, we collect your name, phone number, delivery address, and the details of what you've ordered. We do not collect payment card information — Cash on Delivery, bank transfer, EasyPaisa and JazzCash payments are handled directly between you and the relevant service.</p>
+        <h3>How we use it</h3>
+        <ul>
+          <li>To process, pack and deliver your order</li>
+          <li>To contact you about your order status by phone or WhatsApp</li>
+          <li>To send occasional updates on new arrivals and offers, only if you've opted in</li>
+        </ul>
+        <h3>Sharing</h3>
+        <p>We share your delivery details only with the courier fulfilling your order. We do not sell or rent your information to third parties.</p>
+        <h3>Your choices</h3>
+        <p>You can ask to be removed from our WhatsApp list, or request that we delete your order history, at any time by calling or messaging <strong>+92 315 3755007</strong>.</p>
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'shipping-policy'){
+    return `
+    ${infoHead('POLICIES', 'Shipping <em>policy</em>')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <span class="info-updated">Last updated · July 2026</span>
+      <div class="prose">
+        <p>We ship across Pakistan and hand-deliver locally in Hyderabad. Here's what to expect after you order.</p>
+        <h3>Delivery times</h3>
+        <ul>
+          <li><strong>Hyderabad city:</strong> same-day or next-day delivery on most orders</li>
+          <li><strong>Rest of Sindh:</strong> 1–3 working days</li>
+          <li><strong>Rest of Pakistan:</strong> 2–5 working days via our courier partners</li>
+        </ul>
+        <h3>Delivery charges</h3>
+        <p>Delivery fees are calculated by location and shown at checkout before you confirm your order. We occasionally run free-delivery promotions — watch the top banner and our WhatsApp group for these.</p>
+        <h3>Cash on Delivery</h3>
+        <p>Cash on Delivery is available nationwide. Please have the exact amount ready for the courier where possible.</p>
+        <h3>Tracking your order</h3>
+        <p>Once your order ships, we'll message you the courier and tracking details on WhatsApp. For any delivery questions, call <strong>+92 315 3755007</strong>.</p>
+      </div>
+    </div></section>`;
+  }
+
+  if (slug === 'terms-of-service'){
+    return `
+    ${infoHead('POLICIES', 'Terms of <em>service</em>')}
+    <section class="section" style="padding-top:0"><div class="wrap info-wrap">
+      <span class="info-updated">Last updated · July 2026</span>
+      <div class="prose">
+        <p>By ordering from Qafla Men's Wear, either in-store or through this website, you agree to the following terms.</p>
+        <h3>Orders and pricing</h3>
+        <p>All prices are listed in Pakistani Rupees (PKR) and include applicable taxes unless stated otherwise. We reserve the right to correct pricing errors and to limit order quantities on any item.</p>
+        <h3>Product availability</h3>
+        <p>Stock levels shown on the site are updated regularly but are not guaranteed in real time. If an item you've ordered is out of stock, we'll contact you to offer an alternative, a size swap, or a full refund of any advance paid.</p>
+        <h3>Payment</h3>
+        <p>We accept Cash on Delivery, bank transfer, EasyPaisa and JazzCash. Orders paid by bank or wallet transfer are confirmed once payment is received.</p>
+        <h3>Use of this site</h3>
+        <p>Product photography, text and the Qafla name and logo are the property of Qafla Men's Wear and may not be reproduced without permission.</p>
+        <h3>Contact</h3>
+        <p>Questions about these terms can be directed to <strong>+92 315 3755007</strong> or in person at Shop No. 02, Shaheen Arcade, Latifabad Unit No. 8, Hyderabad.</p>
+      </div>
+    </div></section>`;
+  }
+
+  return infoHead('', 'Page not found');
 }
 
 function renderDrawer(){
@@ -894,7 +1102,7 @@ function renderGateBody(){
       ${gateIcon('lock')}
       <h3>Owner's room</h3>
       <p>Enter the admin passcode to manage products, stock and orders.</p>
-      <form data-action="admin-login">
+      <form data-action="admin-login" class="gate-form-col">
         <div class="pass-field">
           <input type="${state.admin.reset.showPass ? 'text' : 'password'}" id="gate-pass" placeholder="Passcode" autocomplete="off" />
           <button type="button" class="pass-eye" data-action="gate-toggle-pass" aria-label="Show passcode">
@@ -1062,8 +1270,18 @@ function adminForm(){
           <div class="field"><label>Swatch</label><input type="color" name="chex" value="${p ? esc(p.colorway.hex) : '#C9A99A'}" /></div>
         </div>
       </div>
-      <div class="fsec"><h4>Images — one Unsplash photo ID or full image URL per line *</h4>
-        <div class="field"><textarea name="images" required placeholder="1521572163474-6864f9cf17ab&#10;https://images.unsplash.com/photo-…">${v(imgs)}</textarea></div>
+      <div class="fsec"><h4>Product images *</h4>
+        <div class="img-upload-row">
+          <label class="btn btn--ghost-dark img-upload-btn" for="img-file-input">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M12 4 7 9M12 4l5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+            Upload from device
+          </label>
+          <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" />
+          <span class="img-upload-hint">Pick photos from your gallery or camera — or paste image URLs below, one per line</span>
+        </div>
+        <div class="field"><textarea name="images" id="images-textarea" required placeholder="1521572163474-6864f9cf17ab&#10;https://images.unsplash.com/photo-…">${v(imgs)}</textarea></div>
+        <div class="img-upload-busy" id="img-upload-busy" hidden>Processing image…</div>
+        <div class="img-thumbs" id="img-thumbs"></div>
       </div>
       <div class="fsec"><h4>Stock per size</h4>
         <div class="stock-grid">
@@ -1093,6 +1311,68 @@ function adminForm(){
       <button class="btn btn--ghost-dark" type="button" data-action="admin-cancel">Cancel</button>
     </div>
   </form>`;
+}
+
+function resolveAdminImgSrc(line){
+  return isFullImgUrl(line) ? line : IMG(line);
+}
+
+function refreshImgThumbsUI(){
+  const box = $('#img-thumbs'), ta = $('#images-textarea');
+  if (!box || !ta) return;
+  const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+  box.innerHTML = lines.map((line, i) => `
+    <div class="img-thumb">
+      <img src="${esc(resolveAdminImgSrc(line))}" alt="" onerror="this.style.opacity=.25" />
+      ${i === 0 ? '<span class="cover-tag">COVER</span>' : ''}
+      <button type="button" class="rm" data-action="img-remove" data-i="${i}" aria-label="Remove image">✕</button>
+    </div>`).join('');
+}
+
+// Resizes + compresses an uploaded photo client-side (max 1200px edge, JPEG q.82)
+// so a phone gallery photo (often 3-8MB) doesn't blow past localStorage limits.
+function compressImageFile(file){
+  return new Promise((resolve, reject) => {
+    if (!file.type || !file.type.startsWith('image/')){ reject(new Error('Not an image')); return; }
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('Could not decode image'));
+      img.onload = () => {
+        const max = 1200;
+        let { width, height } = img;
+        if (width > max || height > max){
+          const scale = max / Math.max(width, height);
+          width = Math.round(width * scale); height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleImgFileUpload(files){
+  const ta = $('#images-textarea'), busy = $('#img-upload-busy');
+  if (!ta || !files || !files.length) return;
+  if (busy) busy.hidden = false;
+  const added = [];
+  for (const file of files){
+    try { added.push(await compressImageFile(file)); }
+    catch(e){ toast(`Couldn't add ${file.name || 'that photo'} — try another`); }
+  }
+  if (added.length){
+    const existing = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+    ta.value = existing.concat(added).join('\n');
+    toast(added.length > 1 ? `${added.length} photos added` : 'Photo added');
+  }
+  if (busy) busy.hidden = true;
+  refreshImgThumbsUI();
 }
 
 function saveProduct(f){
@@ -1132,10 +1412,12 @@ function saveProduct(f){
   renderRoute(false);
 }
 
+const INFO_ROUTES = ['blog','faqs','about','contact','refund-policy','privacy-policy','shipping-policy','terms-of-service'];
 function currentRoute(){
   const h = location.hash || '#/';
   if (h.startsWith('#/admin')) return 'admin';
   if (h.startsWith('#/shop')) return 'shop';
+  for (const slug of INFO_ROUTES){ if (h.startsWith('#/' + slug)) return slug; }
   return 'home';
 }
 
@@ -1191,6 +1473,7 @@ function renderRoute(scroll = true){
   const view = $('#view');
   if (r === 'home') view.innerHTML = renderHome();
   else if (r === 'shop') view.innerHTML = renderShop();
+  else if (INFO_ROUTES.includes(r)) view.innerHTML = renderInfoPage(r);
   else view.innerHTML = renderAdmin();
 
   $$('#nav-links a').forEach(a => {
@@ -1208,6 +1491,7 @@ function renderRoute(scroll = true){
   initReveals();
   initLockCountdown();
   initResendCountdown();
+  refreshImgThumbsUI();
 }
 
 function refreshShopResults(){
@@ -1253,6 +1537,7 @@ document.addEventListener('click', e => {
   else if (a === 'remove'){ state.cart.splice(+t.dataset.idx, 1); persistCart(); renderDrawer(); }
   else if (a === 'checkout'){ closeCart(); openCheckout(); }
   else if (a === 'close-cart-link') closeCart();
+  else if (a === 'faq-toggle'){ t.closest('.faq-item').classList.toggle('open'); }
   else if (a === 'f-cat'){ state.filters.cat = t.dataset.v; refreshShopResults(); }
   else if (a === 'f-size'){ state.filters.size = t.dataset.v; refreshShopResults(); }
   else if (a === 'admin-tab'){ state.admin.tab = t.dataset.v; state.admin.editing = null; renderRoute(false); }
@@ -1295,6 +1580,13 @@ document.addEventListener('click', e => {
       <td><button type="button" class="mini-btn danger" data-action="chart-del">✕</button></td></tr>`);
   }
   else if (a === 'chart-del'){ t.closest('tr').remove(); }
+  else if (a === 'img-remove'){
+    const ta = $('#images-textarea'); if (!ta) return;
+    const lines = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+    lines.splice(+t.dataset.i, 1);
+    ta.value = lines.join('\n');
+    refreshImgThumbsUI();
+  }
   else if (a === 'co-method'){
     state.checkout.method = t.dataset.v;
     openModal(renderCheckoutModal(), true);
@@ -1444,9 +1736,14 @@ document.addEventListener('submit', e => {
 
 document.addEventListener('input', e => {
   if (e.target.id === 'shop-search'){ state.filters.q = e.target.value; refreshShopResults(); }
+  if (e.target.id === 'images-textarea'){ refreshImgThumbsUI(); }
 });
 document.addEventListener('change', e => {
   if (e.target.id === 'shop-sort'){ state.filters.sort = e.target.value; refreshShopResults(); }
+  if (e.target.id === 'img-file-input'){
+    handleImgFileUpload(e.target.files);
+    e.target.value = '';
+  }
 });
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape'){ closeModal(); closeCart(); }
