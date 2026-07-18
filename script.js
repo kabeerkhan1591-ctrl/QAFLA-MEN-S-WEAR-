@@ -4,23 +4,21 @@
 const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
 
-// Only create client once
-let supabase;
-try {
-  if (typeof window.supabase !== 'undefined') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  } else {
-    console.error('Supabase SDK not loaded');
-  }
-} catch(e) {
-  console.error('Supabase init failed:', e);
-}
-
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
 const FACEBOOK_APP_ID  = '1234567890';
+
+// Create Supabase client safely (only once)
+const supabase = window.supabase ? 
+  window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : 
+  null;
+
+if (!supabase) {
+  console.error('Supabase SDK not loaded - check script order in index.html');
+}
+
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
-const IMG_STORE  = IMG('1441986300917-64674bd600d8', 1200);
+const IMG_STORE = IMG('1441986300917-64674bd600d8', 1200);
 const LIFE = ['1445205170230-053b83016050','1544441893-675973e31985','1489987707025-afc232f7ea0f','1556905055-8f358a7a47b2','1516762689617-e1cffcef479d','1591047139829-d91aecb6caea','1542272604-787c3835535d','1509316785289-025f5b846b35'];
 
 const DEFAULT_CHART = [
