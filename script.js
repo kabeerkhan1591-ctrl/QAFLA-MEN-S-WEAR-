@@ -19,12 +19,10 @@ function initSupabase() {
   }
 }
 
-// Initialize when ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initSupabase);
-} else {
-  initSupabase();
-}
+// Initialize immediately. The Supabase CDN <script> tag runs before this
+// file in index.html, so window.supabase is already available here --
+// waiting for DOMContentLoaded only delayed this past init()'s first calls.
+initSupabase();
 
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
@@ -103,6 +101,10 @@ async function loadProducts(){
   }));
 }
 async function loadOrders(){
+  if (!supabaseClient) {
+    console.error('Supabase not ready');
+    return;
+  }
   const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
   if (error){ console.error('loadOrders error:', error); return; }
   state.orders = data.map(o => ({
@@ -116,6 +118,10 @@ async function loadOrders(){
 }
 
 async function loadSubs(){
+  if (!supabaseClient) {
+    console.error('Supabase not ready');
+    return;
+  }
   const { data, error } = await supabaseClient.from('subscribers').select('*').order('created_at', { ascending: false });
   if (error){ console.error('loadSubs error:', error); return; }
   state.subs = data.map(s => ({
