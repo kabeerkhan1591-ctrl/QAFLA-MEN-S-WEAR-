@@ -1,28 +1,38 @@
 'use strict';
 
-// ===== SUPABASE CONFIG =====
-const SUPABASE_URL = 'https://rckdhxbviixzhfnldavx.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJja2RoeGJ2aWl4emhmbmxkYXZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzOTYxNDEsImV4cCI6MjA5OTk3MjE0MX0.WCzQkYiWDpsZkdz_L3K6wvqWNOtHEAhl5iickefbEas';
+// ===== FIREBASE CONFIG =====
+// Get these values from: Firebase Console -> Project settings -> General ->
+// "Your apps" -> Web app -> SDK setup and configuration -> Config.
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyDbZBdhvVjbvQKWnesGUVaO_kJ2kQ5-Ycg',
+  authDomain: 'qafla-mens-wear.firebaseapp.com',
+  projectId: 'qafla-mens-wear',
+  storageBucket: 'qafla-mens-wear.firebasestorage.app',
+  messagingSenderId: '375127759439',
+  appId: '1:375127759439:web:35e22bd0981224b693683a',
+};
 
 const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.googleusercontent.com';
 const FACEBOOK_APP_ID  = '1234567890';
 
-// Safe Supabase client
-let supabaseClient = null;
+// Safe Firestore client -- this is what every device (owner's phone, staff
+// laptop, etc.) reads from and writes to, so everyone always sees the same
+// live data with no manual sync.
+let db = null;
 
-function initSupabase() {
-  if (typeof window.supabase !== 'undefined') {
-    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    console.log('✅ Supabase initialized successfully');
+function initFirebase() {
+  if (typeof firebase !== 'undefined') {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    console.log('✅ Firebase initialized successfully');
   } else {
-    console.error('❌ Supabase SDK not loaded');
+    console.error('❌ Firebase SDK not loaded');
   }
 }
 
-// Initialize immediately. The Supabase CDN <script> tag runs before this
-// file in index.html, so window.supabase is already available here --
-// waiting for DOMContentLoaded only delayed this past init()'s first calls.
-initSupabase();
+// Initialize immediately. The Firebase CDN <script> tags run before this
+// file in index.html, so the firebase global is already available here.
+initFirebase();
 
 const IMG = (id, w = 900) => `https://images.unsplash.com/photo-${id}?q=80&w=${w}&auto=format&fit=crop`;
 const IMG_HERO  = IMG('1542272604-787c3835535d', 2000);
@@ -72,65 +82,86 @@ const state = {
   checkout: { method:'cod' },
 };
 
-// ===== SUPABASE DATA FUNCTIONS =====
+// ===== FIRESTORE DATA FUNCTIONS =====
 
 async function loadProducts(){
-  if (!supabaseClient) { 
-    console.error('Supabase not ready'); 
-    return; 
-  }
-  const { data, error } = await supabaseClient.from('products').select('*').order('id');
-  if (error){ console.error('loadProducts error:', error); toast('Could not load products -- check connection'); return; }
-  state.products = data.map(p => ({
-    id: p.id,
-    title: p.title,
-    sub: p.sub,
-    desc: p.description,
-    cat: p.category,
-    fabric: p.fabric,
-    care: p.care,
-    price: p.price,
-    compareAt: p.compare_at_price || 0,
-    colorway: { name: p.color_name, hex: p.color_hex },
-    img: p.images && p.images.length ? p.images[0] : '',
-    imgs: p.images || [],
-    isNew: p.is_new,
-    featured: p.featured,
-    sizes: p.sizes || {},
-    chart: p.size_chart || DEFAULT_CHART,
-  }));
-}
-async function loadOrders(){
-  if (!supabaseClient) {
-    console.error('Supabase not ready');
+  if (!db) {
+    console.error('Firestore not ready');
     return;
   }
-  const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
-  if (error){ console.error('loadOrders error:', error); return; }
-  state.orders = data.map(o => ({
-    id: o.id,
-    date: new Date(o.created_at).toLocaleString('en-PK', { dateStyle:'medium', timeStyle:'short' }),
-    customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, city: o.customer_city, notes: o.customer_notes || '' },
-    items: o.items,
-    total: o.total,
-    payment: { method: o.payment_method, label: o.payment_label, ref: o.payment_ref || '', status: o.payment_status },
-  }));
+  try {
+    const snap = await db.collection('products').get();
+    const rows = snap.docs.map(d => d.data());
+    rows.sort((a, b) => Number(a.id) - Number(b.id));
+    state.products = rows.map(p => ({
+      id: p.id,
+      title: p.title,
+      sub: p.sub,
+      desc: p.description,
+      cat: p.category,
+      fabric: p.fabric,
+      care: p.care,
+      price: p.price,
+      compareAt: p.compare_at_price || 0,
+      colorway: { name: p.color_name, hex: p.color_hex },
+      img: p.images && p.images.length ? p.images[0] : '',
+      imgs: p.images || [],
+      isNew: p.is_new,
+      featured: p.featured,
+      sizes: p.sizes || {},
+      chart: p.size_chart || DEFAULT_CHART,
+    }));
+  } catch (error) {
+    console.error('loadProducts error:', error);
+    toast('Could not load products -- check connection');
+  }
+}
+
+async function loadOrders(){
+  if (!db) {
+    console.error('Firestore not ready');
+    return;
+  }
+  try {
+    const snap = await db.collection('orders').orderBy('created_at', 'desc').get();
+    state.orders = snap.docs.map(d => {
+      const o = d.data();
+      const created = o.created_at && o.created_at.toDate ? o.created_at.toDate() : new Date();
+      return {
+        id: o.id,
+        date: created.toLocaleString('en-PK', { dateStyle: 'medium', timeStyle: 'short' }),
+        customer: { name: o.customer_name, phone: o.customer_phone, address: o.customer_address, city: o.customer_city, notes: o.customer_notes || '' },
+        items: o.items,
+        total: o.total,
+        payment: { method: o.payment_method, label: o.payment_label, ref: o.payment_ref || '', status: o.payment_status },
+      };
+    });
+  } catch (error) {
+    console.error('loadOrders error:', error);
+  }
 }
 
 async function loadSubs(){
-  if (!supabaseClient) {
-    console.error('Supabase not ready');
+  if (!db) {
+    console.error('Firestore not ready');
     return;
   }
-  const { data, error } = await supabaseClient.from('subscribers').select('*').order('created_at', { ascending: false });
-  if (error){ console.error('loadSubs error:', error); return; }
-  state.subs = data.map(s => ({
-    phone: s.phone,
-    date: new Date(s.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })
-  }));
+  try {
+    const snap = await db.collection('subscribers').orderBy('created_at', 'desc').get();
+    state.subs = snap.docs.map(d => {
+      const s = d.data();
+      const created = s.created_at && s.created_at.toDate ? s.created_at.toDate() : new Date();
+      return {
+        phone: s.phone,
+        date: created.toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+      };
+    });
+  } catch (error) {
+    console.error('loadSubs error:', error);
+  }
 }
 
-async function saveProductToSupabase(product){
+async function saveProductToFirestore(product){
   const payload = {
     id: product.id,
     title: product.title,
@@ -149,40 +180,62 @@ async function saveProductToSupabase(product){
     sizes: product.sizes,
     size_chart: product.chart,
   };
-  const { error } = await supabaseClient.from('products').upsert(payload);
-  if (error){ console.error('saveProduct error:', error); toast('Save failed -- check connection'); return false; }
-  return true;
+  try {
+    await db.collection('products').doc(String(product.id)).set(payload, { merge: true });
+    return true;
+  } catch (error) {
+    console.error('saveProduct error:', error);
+    toast('Save failed -- check connection');
+    return false;
+  }
 }
 
-async function deleteProductFromSupabase(id){
-  const { error } = await supabaseClient.from('products').delete().eq('id', id);
-  if (error){ console.error('deleteProduct error:', error); toast('Delete failed'); return false; }
-  return true;
+async function deleteProductFromFirestore(id){
+  try {
+    await db.collection('products').doc(String(id)).delete();
+    return true;
+  } catch (error) {
+    console.error('deleteProduct error:', error);
+    toast('Delete failed');
+    return false;
+  }
 }
 
-async function saveOrderToSupabase(order){
-  const { error } = await supabaseClient.from('orders').insert({
-    id: order.id,
-    customer_name: order.customer.name,
-    customer_phone: order.customer.phone,
-    customer_address: order.customer.address,
-    customer_city: order.customer.city,
-    customer_notes: order.customer.notes,
-    total: order.total,
-    payment_method: order.payment.method,
-    payment_label: order.payment.label,
-    payment_ref: order.payment.ref,
-    payment_status: order.payment.status,
-    items: order.items,
-  });
-  if (error){ console.error('saveOrder error:', error); return false; }
-  return true;
+async function saveOrderToFirestore(order){
+  try {
+    await db.collection('orders').doc(String(order.id)).set({
+      id: order.id,
+      customer_name: order.customer.name,
+      customer_phone: order.customer.phone,
+      customer_address: order.customer.address,
+      customer_city: order.customer.city,
+      customer_notes: order.customer.notes,
+      total: order.total,
+      payment_method: order.payment.method,
+      payment_label: order.payment.label,
+      payment_ref: order.payment.ref,
+      payment_status: order.payment.status,
+      items: order.items,
+      created_at: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    return true;
+  } catch (error) {
+    console.error('saveOrder error:', error);
+    return false;
+  }
 }
 
-async function saveSubscriberToSupabase(phone){
-  const { error } = await supabaseClient.from('subscribers').insert({ phone });
-  if (error && error.code !== '23505'){ console.error('saveSubscriber error:', error); return false; }
-  return true;
+async function saveSubscriberToFirestore(phone){
+  try {
+    const ref = db.collection('subscribers').doc(phone);
+    const existing = await ref.get();
+    if (existing.exists) return true; // already subscribed -- treat as success, like the old duplicate-key handling
+    await ref.set({ phone, created_at: firebase.firestore.FieldValue.serverTimestamp() });
+    return true;
+  } catch (error) {
+    console.error('saveSubscriber error:', error);
+    return false;
+  }
 }
 
 // ===== HELPERS =====
@@ -1051,28 +1104,31 @@ async function placeOrder(fd){
   // Update stock locally first
   order.items.forEach(it => { const p = findProduct(it.id); if (p) p.sizes[it.size] = Math.max(0, Number(p.sizes[it.size]) - it.qty); });
 
-  // Save to Supabase
-  console.log('Saving to Supabase...');
+  // Save to Firestore
+  console.log('Saving to Firestore...');
   try {
-    const saved = await saveOrderToSupabase(order);
-    console.log('Supabase save result:', saved);
+    const saved = await saveOrderToFirestore(order);
+    console.log('Firestore save result:', saved);
     if (saved) {
-      console.log('Order saved to Supabase, updating stock...');
-      // Also update product stock in Supabase
+      console.log('Order saved to Firestore, updating stock...');
+      // Also update product stock in Firestore
       for (const it of order.items) {
         const p = findProduct(it.id);
         if (p) {
-          const { error } = await supabaseClient.from('products').update({ sizes: p.sizes }).eq('id', p.id);
-          if (error) console.error('Stock update error for', p.id, error);
+          try {
+            await db.collection('products').doc(String(p.id)).update({ sizes: p.sizes });
+          } catch (error) {
+            console.error('Stock update error for', p.id, error);
+          }
         }
       }
       console.log('Stock updated');
     } else {
-      console.error('Failed to save order to Supabase');
+      console.error('Failed to save order to Firestore');
       toast('Order saved locally but cloud sync failed');
     }
   } catch (err) {
-    console.error('Supabase error:', err);
+    console.error('Firestore error:', err);
     toast('Cloud save failed -- order saved locally');
   }
 
@@ -1163,7 +1219,7 @@ function renderAdmin(){
         <button class="atab" data-action="admin-logout">Log out</button>
       </div>
     </div>
-    <div class="admin-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Catalogue, orders and subscribers are now synced to Supabase cloud. For staff logins, connect this panel to Supabase Auth.</div>
+    <div class="admin-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg> Catalogue, orders and subscribers are now synced to Firebase cloud. For staff logins, connect this panel to Firebase Auth.</div>
     ${tab === 'products' ? adminProducts() : tab === 'orders' ? adminOrders() : tab === 'subs' ? adminSubs() : adminForm()}
   </div></section>`;
 }
@@ -1495,8 +1551,8 @@ async function saveProduct(f){
     sizes, chart: chart.length ? chart : DEFAULT_CHART.map(r => ({...r})),
   };
 
-  // Save to Supabase
-  const saved = await saveProductToSupabase(prod);
+  // Save to Firestore
+  const saved = await saveProductToFirestore(prod);
   if (!saved) return;
 
   if (old) Object.assign(old, prod); else state.products.unshift(prod);
@@ -1641,7 +1697,7 @@ document.addEventListener('click', e => {
   else if (a === 'admin-del'){
     const p = findProduct(id);
     if (confirm('Delete "' + (p ? p.title : id) + '" from the shop?')){
-      deleteProductFromSupabase(id).then(ok => {
+      deleteProductFromFirestore(id).then(ok => {
         if (ok) {
           state.products = state.products.filter(x => x.id !== id);
           toast('Product deleted'); renderRoute(false);
@@ -1652,8 +1708,8 @@ document.addEventListener('click', e => {
   else if (a === 'admin-cancel'){ state.admin.tab = 'products'; state.admin.editing = null; renderRoute(false); }
   else if (a === 'admin-reset'){
     if (confirm('Restore the original 14-product demo catalogue? Your added products will be replaced.')){
-      // This would need to re-seed from Supabase or a backup
-      toast('Demo restore -- re-seed from Supabase SQL');
+      // This would need to re-seed from Firestore or a backup
+      toast('Demo restore -- re-seed from Firestore');
     }
   }
   else if (a === 'admin-logout'){ state.admin.authed = false; store.set(K.admin, false); renderRoute(false); }
@@ -1761,9 +1817,10 @@ document.addEventListener('submit', async e => {
     const phone = f.querySelector('[name=phone]').value.trim();
     if (!phone) return;
 
-    // Save to Supabase
-    const saved = await saveSubscriberToSupabase(phone);
-    if (saved || (await supabaseClient.from('subscribers').select('phone').eq('phone', phone).single()).data) {
+    // Save to Firestore (saveSubscriberToFirestore already treats an
+    // existing subscriber as success, so no extra lookup is needed here)
+    const saved = await saveSubscriberToFirestore(phone);
+    if (saved) {
       state.subs.unshift({ phone, date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) });
     }
 
