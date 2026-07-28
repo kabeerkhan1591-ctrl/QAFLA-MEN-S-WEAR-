@@ -8,11 +8,11 @@ const GOOGLE_CLIENT_ID = '1080648523537-980us9f34h8g3gf0o7omvu4qhl48h7f9.apps.go
 const FACEBOOK_APP_ID  = '1234567890';
 
 // Safe Supabase client
-let supabase = null;
+let supabaseClient = null;
 
 function initSupabase() {
   if (typeof window.supabase !== 'undefined') {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     console.log('✅ Supabase initialized successfully');
   } else {
     console.error('❌ Supabase SDK not loaded');
@@ -77,11 +77,11 @@ const state = {
 // ===== SUPABASE DATA FUNCTIONS =====
 
 async function loadProducts(){
-  if (!supabase) { 
+  if (!supabaseClient) { 
     console.error('Supabase not ready'); 
     return; 
   }
-  const { data, error } = await supabase.from('products').select('*').order('id');
+  const { data, error } = await supabaseClient.from('products').select('*').order('id');
   if (error){ console.error('loadProducts error:', error); toast('Could not load products -- check connection'); return; }
   state.products = data.map(p => ({
     id: p.id,
@@ -103,7 +103,7 @@ async function loadProducts(){
   }));
 }
 async function loadOrders(){
-  const { data, error } = await supabase.from('orders').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabaseClient.from('orders').select('*').order('created_at', { ascending: false });
   if (error){ console.error('loadOrders error:', error); return; }
   state.orders = data.map(o => ({
     id: o.id,
@@ -116,7 +116,7 @@ async function loadOrders(){
 }
 
 async function loadSubs(){
-  const { data, error } = await supabase.from('subscribers').select('*').order('created_at', { ascending: false });
+  const { data, error } = await supabaseClient.from('subscribers').select('*').order('created_at', { ascending: false });
   if (error){ console.error('loadSubs error:', error); return; }
   state.subs = data.map(s => ({
     phone: s.phone,
@@ -143,19 +143,19 @@ async function saveProductToSupabase(product){
     sizes: product.sizes,
     size_chart: product.chart,
   };
-  const { error } = await supabase.from('products').upsert(payload);
+  const { error } = await supabaseClient.from('products').upsert(payload);
   if (error){ console.error('saveProduct error:', error); toast('Save failed -- check connection'); return false; }
   return true;
 }
 
 async function deleteProductFromSupabase(id){
-  const { error } = await supabase.from('products').delete().eq('id', id);
+  const { error } = await supabaseClient.from('products').delete().eq('id', id);
   if (error){ console.error('deleteProduct error:', error); toast('Delete failed'); return false; }
   return true;
 }
 
 async function saveOrderToSupabase(order){
-  const { error } = await supabase.from('orders').insert({
+  const { error } = await supabaseClient.from('orders').insert({
     id: order.id,
     customer_name: order.customer.name,
     customer_phone: order.customer.phone,
@@ -174,7 +174,7 @@ async function saveOrderToSupabase(order){
 }
 
 async function saveSubscriberToSupabase(phone){
-  const { error } = await supabase.from('subscribers').insert({ phone });
+  const { error } = await supabaseClient.from('subscribers').insert({ phone });
   if (error && error.code !== '23505'){ console.error('saveSubscriber error:', error); return false; }
   return true;
 }
@@ -1056,7 +1056,7 @@ async function placeOrder(fd){
       for (const it of order.items) {
         const p = findProduct(it.id);
         if (p) {
-          const { error } = await supabase.from('products').update({ sizes: p.sizes }).eq('id', p.id);
+          const { error } = await supabaseClient.from('products').update({ sizes: p.sizes }).eq('id', p.id);
           if (error) console.error('Stock update error for', p.id, error);
         }
       }
@@ -1757,7 +1757,7 @@ document.addEventListener('submit', async e => {
 
     // Save to Supabase
     const saved = await saveSubscriberToSupabase(phone);
-    if (saved || (await supabase.from('subscribers').select('phone').eq('phone', phone).single()).data) {
+    if (saved || (await supabaseClient.from('subscribers').select('phone').eq('phone', phone).single()).data) {
       state.subs.unshift({ phone, date: new Date().toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) });
     }
 
