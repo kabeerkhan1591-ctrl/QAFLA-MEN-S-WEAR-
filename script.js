@@ -4,7 +4,7 @@
 // Get these values from: Firebase Console -> Project settings -> General ->
 // "Your apps" -> Web app -> SDK setup and configuration -> Config.
 const FIREBASE_CONFIG = {
-  apiKey: 'AIzaSyDbZBdhvVjbvQKWnesGUVaO_kJ2kQ5-Ycg',
+  apiKey: 'AIzaSyDGVGZwAourpZdaqtDIAjxCWDOcdbVPZUs',
   authDomain: 'qafla-mens-wear.firebaseapp.com',
   projectId: 'qafla-mens-wear',
   storageBucket: 'qafla-mens-wear.firebasestorage.app',
